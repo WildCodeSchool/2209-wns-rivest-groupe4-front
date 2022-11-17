@@ -8,7 +8,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "echo '----- Checking Frontend...' && prettier --debug-check . && eslint --ext .tsx . && echo '----- Done!'",
-    "fix": "prettier --write . && eslint --fix --ext .tsx ."
+    "fix": "prettier --write . && eslint --fix --ext .tsx .",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@apollo/client": "^3.7.1",
@@ -32,7 +33,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.10",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "husky": "^8.0.2",
+    "husky": "^8.0.0",
     "postcss": "^8.4.19",
     "prettier": "^2.7.1",
     "tailwindcss": "^3.2.4",
