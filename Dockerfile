@@ -7,8 +7,6 @@ COPY package-lock.json package-lock.json
 
 RUN npm i
 
-COPY src src
-
-COPY tsconfig.json tsconfig.json
+COPY . .
 
 CMD npm run dev
