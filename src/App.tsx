@@ -1,9 +1,9 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 
 import HomeScreen from "./screens/HomeScreen";
 import LoginScreen from "./screens/LoginScreen";
 
-import './index.css';
+import "./index.css";
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
       <Route path="/" element={<HomeScreen />} />
       <Route path="/login" element={<LoginScreen />} />
     </Routes>
-  )
+  );
 }
 
-export default App
+export default App;

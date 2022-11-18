@@ -1,9 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-
-const HomeScreen = () => {
-
+function HomeScreen() {
   const token = localStorage.getItem("token");
 
   const navigate = useNavigate();
@@ -14,9 +12,7 @@ const HomeScreen = () => {
     }
   });
 
-  return (
-    <div>HomeScreen</div>
-  )
+  return <div>HomeScreen</div>;
 }
 
-export default HomeScreen
+export default HomeScreen;

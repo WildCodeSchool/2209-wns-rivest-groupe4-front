@@ -1,12 +1,12 @@
-import LoginContainer from '../container/LoginContainer';
+import LoginContainer from "../container/LoginContainer";
 
-const LoginScreen = () => {
+function LoginScreen() {
   return (
     <section>
-        <h1>Login screen</h1>
-        <LoginContainer />
+      <h1>Login screen</h1>
+      <LoginContainer />
     </section>
-  )
+  );
 }
 
-export default LoginScreen
+export default LoginScreen;
