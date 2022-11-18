@@ -27,7 +27,7 @@ function App() {
       <Route path="/shares" element={<SharesScreen />} />
       <Route path="/user-space" element={<UserSpaceScreen />} />
       <Route path="/premium" element={<PremiumScreen />} />
-      <Route path="/premium" element={<RedirectScreen />} />
+      <Route path="/redirect" element={<RedirectScreen />} />
     </Routes>
   );
 }
