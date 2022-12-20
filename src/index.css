@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  background: linear-gradient(270.04deg, #1d2448 0.04%, #131d2f 99.97%);
+  color: white;
+  box-sizing: border-box;
+}
