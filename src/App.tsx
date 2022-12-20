@@ -16,7 +16,6 @@ import "./index.css";
 import NavbarContainer from "./container/NavbarContainer";
 
 function App() {
-  const user = 2;
   return (
     <>
       <NavbarContainer />

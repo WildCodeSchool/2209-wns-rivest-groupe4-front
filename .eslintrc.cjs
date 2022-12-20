@@ -26,6 +26,7 @@ module.exports = {
     "react/prop-types": 0,
     "react/jsx-no-constructed-context-values": "off",
     "no-console": "off",
+    "no-nested-ternary": "off",
     "no-restricted-syntax": [
       "error",
       {
