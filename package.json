@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "WATCHPACK_POLLING=true react-scripts vite",
+    "dev": "WATCHPACK_POLLING=true vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "echo '----- Checking Frontend...' && prettier --debug-check . && eslint --ext .tsx . && echo '----- Done!'",
@@ -13,11 +13,14 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.1",
+    "@hookform/resolvers": "^2.9.10",
     "ace-builds": "^1.14.0",
     "react": "^18.2.0",
     "react-ace": "^10.1.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.4.3"
+    "react-hook-form": "^7.41.0",
+    "react-router-dom": "^6.4.3",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@types/react": "^18.0.24",

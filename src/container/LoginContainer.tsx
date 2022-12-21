@@ -1,5 +1,7 @@
-import { useState } from "react";
-// import { Button } from "flowbite-react";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { gql, useLazyQuery } from "@apollo/client";
 
@@ -9,20 +11,57 @@ const GET_TOKEN = gql`
   }
 `;
 
-function LoginContainer() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+interface ILoginFormValues {
+  email: string;
+  password: string;
+}
 
+/* --------------------FORM VALIDATION-------------------- */
+const schema = yup
+  .object({
+    email: yup
+      .string()
+      .email("Please enter a valid email.")
+      .required("Please enter an email."),
+    password: yup
+      .string()
+      .required("Please enter a password.")
+      .min(8, "Your password should have 8 caracters at least."),
+  })
+  .required();
+
+function LoginContainer() {
   const navigate = useNavigate();
-  const [loadToken, { error }] = useLazyQuery(GET_TOKEN, {
+  const [login, { error }] = useLazyQuery(GET_TOKEN, {
     onCompleted(data: { getToken: string }) {
       localStorage.setItem("token", data.getToken);
       navigate("/");
     },
   });
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ILoginFormValues>({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit: SubmitHandler<ILoginFormValues> = async (data) => {
+    login({
+      variables: data,
+    });
+  };
+
   return (
-    <div className="w-1/2 mx-auto mt-10 px-20 py-10 bg-[#273242] text-white">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-1/2 mx-auto mt-10 px-20 py-10 bg-[#273242] text-white"
+    >
       <h1 className="text-center text-3xl font-aldrich">Login</h1>
       <div className="my-6">
         <label
@@ -33,22 +72,13 @@ function LoginContainer() {
           <input
             type="email"
             id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                loadToken({
-                  variables: {
-                    email,
-                    password,
-                  },
-                });
-              }
-            }}
+            {...register("email")}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder=""
-            required
           />
+          {errors.email && (
+            <span className="text-sm text-red-600">{errors.email.message}</span>
+          )}
         </label>
       </div>
       <div className="mb-6">
@@ -60,21 +90,14 @@ function LoginContainer() {
           <input
             type="password"
             id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                loadToken({
-                  variables: {
-                    email,
-                    password,
-                  },
-                });
-              }
-            }}
+            {...register("password")}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            required
           />
+          {errors.password && (
+            <span className="text-sm text-red-600">
+              {errors.password.message}
+            </span>
+          )}
         </label>
         {error?.message === "Invalid Auth" && (
           <span className="text-sm text-red-600">
@@ -95,31 +118,18 @@ function LoginContainer() {
             type="checkbox"
             value=""
             className="w-4 h-4 mr-2 bg-gray-50 rounded border border-gray-300 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
-            required
           />
           Remember me
         </label>
       </div>
-      {/* <Button
-        onClick={() => {
-          loadToken({
-            variables: {
-              email,
-              password,
-            },
-          });
-        }}
-        gradientDuoTone="cyanToBlue"
-      >
-        SIGN UP
-      </Button> */}
+      <button type="submit">SIGN UP</button>
       <p className="text-center text-lg mt-5">
         <NavLink to="/register" className="underline">
           Sign up
         </NavLink>{" "}
         if you don&apos;t have an account yet !
       </p>
-    </div>
+    </form>
   );
 }
 
