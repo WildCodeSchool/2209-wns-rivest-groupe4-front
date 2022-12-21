@@ -13,22 +13,26 @@ import SharesScreen from "./screens/SharesScreen";
 import UserSpaceScreen from "./screens/UserSpaceScreen";
 
 import "./index.css";
+import NavbarContainer from "./container/NavbarContainer";
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<HomeScreen />} />
-      <Route path="/login" element={<LoginScreen />} />
-      <Route path="/register" element={<RegisterScreen />} />
-      <Route path="/editor" element={<EditorScreen />} />
-      <Route path="/projects" element={<ProjectsScreen />} />
-      <Route path="/project-details" element={<ProjectDetailsScreen />} />
-      <Route path="/contact" element={<ContactScreen />} />
-      <Route path="/shares" element={<SharesScreen />} />
-      <Route path="/user-space" element={<UserSpaceScreen />} />
-      <Route path="/premium" element={<PremiumScreen />} />
-      <Route path="/redirect" element={<RedirectScreen />} />
-    </Routes>
+    <>
+      <NavbarContainer />
+      <Routes>
+        <Route path="/" element={<HomeScreen />} />
+        <Route path="/login" element={<LoginScreen />} />
+        <Route path="/register" element={<RegisterScreen />} />
+        <Route path="/editor" element={<EditorScreen />} />
+        <Route path="/projects" element={<ProjectsScreen />} />
+        <Route path="/project-details" element={<ProjectDetailsScreen />} />
+        <Route path="/contact" element={<ContactScreen />} />
+        <Route path="/shares" element={<SharesScreen />} />
+        <Route path="/user-space" element={<UserSpaceScreen />} />
+        <Route path="/premium" element={<PremiumScreen />} />
+        <Route path="/redirect" element={<RedirectScreen />} />
+      </Routes>
+    </>
   );
 }
 
