@@ -17,7 +17,7 @@ import NavbarContainer from "./container/NavbarContainer";
 
 function App() {
   return (
-    <>
+    <main className="flex flex-col w-full h-screen">
       <NavbarContainer />
       <Routes>
         <Route path="/" element={<HomeScreen />} />
@@ -32,7 +32,7 @@ function App() {
         <Route path="/premium" element={<PremiumScreen />} />
         <Route path="/redirect" element={<RedirectScreen />} />
       </Routes>
-    </>
+    </main>
   );
 }
 

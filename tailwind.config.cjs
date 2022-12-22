@@ -1,6 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./index.html", "./src/**/*.{html,js,ts,jsx,tsx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{html,js,ts,jsx,tsx}",
+    "node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}",
+  ],
   theme: {
     extend: {
       animation: {
@@ -32,5 +36,5 @@ module.exports = {
       desktopLarge: { min: "1201px" },
     },
   },
-  plugins: [],
+  plugins: [require("flowbite/plugin")],
 };
