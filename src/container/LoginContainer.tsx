@@ -1,6 +1,7 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { Button } from "flowbite-react";
 
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { gql, useLazyQuery } from "@apollo/client";
@@ -44,10 +45,6 @@ function LoginContainer() {
     handleSubmit,
     formState: { errors },
   } = useForm<ILoginFormValues>({
-    defaultValues: {
-      email: "",
-      password: "",
-    },
     resolver: yupResolver(schema),
   });
 
@@ -100,11 +97,9 @@ function LoginContainer() {
           )}
         </label>
         {error?.message === "Invalid Auth" && (
-          <span className="text-sm text-red-600">
-            Email or password invalid
-          </span>
+          <span className="text-sm text-red-600">Invalid Credentials</span>
         )}
-        <Link to="/login" className="text-sm block">
+        <Link to="/login" className="text-sm block underline">
           Password forgotten
         </Link>
       </div>
@@ -122,7 +117,9 @@ function LoginContainer() {
           Remember me
         </label>
       </div>
-      <button type="submit">SIGN UP</button>
+      <Button type="submit" gradientDuoTone="cyanToBlue" className="m-auto">
+        SIGN UP
+      </Button>
       <p className="text-center text-lg mt-5">
         <NavLink to="/register" className="underline">
           Sign up
