@@ -7,6 +7,7 @@
     "dev": "WATCHPACK_POLLING=true vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "test": "react-scripts test",
     "lint": "echo '----- Checking Frontend...' && prettier --debug-check . && eslint --ext .tsx . && echo '----- Done!'",
     "fix": "prettier --write . && eslint --fix --ext .tsx .",
     "prepare": "husky install"

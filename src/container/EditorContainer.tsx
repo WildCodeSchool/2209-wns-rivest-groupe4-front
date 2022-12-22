@@ -8,7 +8,7 @@ import downloadFile from "../../public/assets/downloadFile.svg";
 import saveFile from "../../public/assets/saveFile.svg";
 import shareFile from "../../public/assets/shareFile.svg";
 import ReturnEditor from "../components/ReturnEditor";
-import InputEditor from "../components/InputEditor";
+import InputEditor from "../components/InputEditor/InputEditor";
 
 function EditorContainer() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
