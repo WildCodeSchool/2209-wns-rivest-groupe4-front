@@ -26,7 +26,7 @@ function UserNavbar({ opened, setOpened }: INavbarProps) {
             onKeyDown={() => setOpened(!opened)}
           >
             <img className="w-8 h-8" src="assets/user.svg" alt="user" />
-            <ul className="absolute flex flex-col justify-center items-center border-b-2 border-l-2 border-white bg-black/30 h-fit w-52 top-20 right-0 ">
+            <ul className="absolute z-30 flex flex-col justify-center items-center border-b-2 border-l-2 border-white bg-black/30 h-fit w-52 top-20 right-0 ">
               <NavLink
                 to="/login"
                 className="p-4 border-b-2 border-white w-full text-center hover:bg-black/40"
@@ -72,7 +72,7 @@ function UserNavbar({ opened, setOpened }: INavbarProps) {
             onKeyDown={() => setOpened(!opened)}
           >
             <img className="w-8 h-8" src="assets/user.svg" alt="user" />
-            <ul className="absolute flex flex-col justify-center items-center border-b-2 border-l-2 border-white bg-black/30 h-fit w-52 top-20 right-0">
+            <ul className="absolute z-30 flex flex-col justify-center items-center border-b-2 border-l-2 border-white bg-black/30 h-fit w-52 top-20 right-0">
               <NavLink
                 to="/user-space"
                 className="p-4 border-b-2 border-white w-full text-center hover:bg-black/40"

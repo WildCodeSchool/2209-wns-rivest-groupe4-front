@@ -80,7 +80,7 @@ function EditorContainer() {
             >
               <img
                 src={isOpen ? arrowRight : arrowLeft}
-                alt="arrow pointing in closing direction"
+                alt={isOpen ? "arrow right" : "arrow left"}
               />
             </button>
           </div>

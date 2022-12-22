@@ -35,6 +35,7 @@ module.exports = {
           "CallExpression[callee.object.name='console'][callee.property.name!=/^(error|warn)$/]",
         message:
           "You can only call the error() and warn() functions from the console object",
+        endOfLine: "auto",
       },
     ],
   },
