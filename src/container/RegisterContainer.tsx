@@ -73,7 +73,7 @@ function RegisterContainer() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="w-1/2 mx-auto mt-10 px-20 py-10 bg-[#273242] text-white"
+      className="w-3/4 md:w-1/2 mx-auto mt-10 p-5 sm:px-20 sm:py-10 bg-[#273242] text-white"
     >
       <h1 className="text-center text-3xl font-aldrich">Register</h1>
       <div className="my-6">
@@ -157,10 +157,10 @@ function RegisterContainer() {
         </label>
       </div>
       <Button type="submit" gradientDuoTone="cyanToBlue" className="m-auto">
-        REGISTER
+        SIGN UP
       </Button>
       <p className="text-center text-lg mt-5">
-        <NavLink to="/register" className="underline">
+        <NavLink to="/login" className="underline">
           Sign in
         </NavLink>{" "}
         if you have an account yet !
