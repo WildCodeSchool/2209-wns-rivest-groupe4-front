@@ -57,7 +57,7 @@ function LoginContainer() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="w-1/2 mx-auto mt-10 px-20 py-10 bg-[#273242] text-white"
+      className="w-3/4 md:w-1/2 mx-auto mt-10 p-5 sm:px-20 sm:py-10 bg-[#273242] text-white"
     >
       <h1 className="text-center text-3xl font-aldrich">Login</h1>
       <div className="my-6">
@@ -71,7 +71,7 @@ function LoginContainer() {
             id="email"
             {...register("email")}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder=""
+            autoComplete="username"
           />
           {errors.email && (
             <span className="text-sm text-red-600">{errors.email.message}</span>
@@ -89,6 +89,7 @@ function LoginContainer() {
             id="password"
             {...register("password")}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            autoComplete="current-password"
           />
           {errors.password && (
             <span className="text-sm text-red-600">
@@ -118,7 +119,7 @@ function LoginContainer() {
         </label>
       </div>
       <Button type="submit" gradientDuoTone="cyanToBlue" className="m-auto">
-        SIGN UP
+        SIGN IN
       </Button>
       <p className="text-center text-lg mt-5">
         <NavLink to="/register" className="underline">
