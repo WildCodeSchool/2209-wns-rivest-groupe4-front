@@ -1,6 +1,8 @@
 // import { useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
 
+import { Link } from "react-router-dom";
+
 function HomeScreen() {
   // const token = localStorage.getItem("token");
 
@@ -82,7 +84,7 @@ function HomeScreen() {
         </div>
         <hr className="mt-8 absolute left-1/2 -ml-0.5 w-0.5 h-32 bg-gray-100 rounded border-0" />
         <div className="">
-          <h3 className="text-2xl text-amber-800 text-center">
+          <h3 className="text-2xl bg-gradient-to-r bg-clip-text text-transparent from-orange-800 via-orange-500 to-yellow-600 animate-premiumColorChanging text-center">
             Premium account
           </h3>
           <div className="flex flex-col items-center">
@@ -105,13 +107,14 @@ function HomeScreen() {
           </div>
         </div>
       </div>
-
-      <button
-        type="button"
-        className="mx-auto mt-8 w-1/5 text-xl bg-[#15202f] rounded-lg px-5 py-2.5 mb-4"
-      >
-        GET YOUR PREMIUM ACCES NOW !
-      </button>
+      <Link className="mx-auto mt-8 w-1/5" to="/premium">
+        <button
+          type="button"
+          className=" text-xl bg-[#15202f] rounded-lg px-5 py-2.5 mb-4"
+        >
+          Get Your Premium Access Now !
+        </button>
+      </Link>
     </section>
   );
 }
