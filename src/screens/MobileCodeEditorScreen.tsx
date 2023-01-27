@@ -9,7 +9,7 @@ import "ace-builds/src-noconflict/ext-emmet";
 
 export default function MobileCodeEditorScreen() {
   return (
-    <div className='absolute top-0' style={{ width: '100vw', height: '100vh'}}>
+    <div className="absolute top-0" style={{ width: "100vw", height: "100vh" }}>
       <AceEditor
         readOnly
         value={undefined}
@@ -36,5 +36,5 @@ export default function MobileCodeEditorScreen() {
         }}
       />
     </div>
-  )
+  );
 }
