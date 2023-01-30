@@ -7,10 +7,15 @@
     "dev": "WATCHPACK_POLLING=true vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "test": "jest --watchAll --env=jsdom",
     "lint": "echo '----- Checking Frontend...' && prettier --debug-check . && eslint --ext .tsx . && echo '----- Done!'",
     "fix": "prettier --write . && eslint --fix --ext .tsx .",
     "prepare": "husky install"
   },
+  "moduleDirectories": [
+    "node_modules",
+    "src"
+  ],
   "dependencies": {
     "@apollo/client": "^3.7.1",
     "@testing-library/jest-dom": "^5.16.5",
@@ -26,10 +31,14 @@
     "react": "^18.2.0",
     "react-ace": "^10.1.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.4.3",
-    "ts-jest": "^29.0.3"
+    "react-router-dom": "^6.4.3"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-react": "^7.18.6",
+    "@babel/preset-typescript": "^7.18.6",
+    "@jest/globals": "^29.3.1",
+    "@types/babel__preset-env": "^7.9.2",
     "@typescript-eslint/eslint-plugin": "^5.43.0",
     "@typescript-eslint/parser": "^5.43.0",
     "@vitejs/plugin-react": "^2.2.0",
@@ -44,9 +53,12 @@
     "eslint-plugin-react": "^7.31.10",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.0",
+    "jest-environment-jsdom": "^29.3.1",
+    "jest-svg-transformer": "^1.0.0",
     "postcss": "^8.4.19",
     "prettier": "^2.7.1",
     "tailwindcss": "^3.2.4",
+    "ts-jest": "^29.0.3",
     "typescript": "^4.8.4",
     "vite": "^3.2.3"
   }

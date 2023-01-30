@@ -1,14 +1,14 @@
 import { Button } from "flowbite-react";
 import React, { useState } from "react";
 
-import EditorAside from "../components/EditorAside";
-import arrowLeft from "../../public/assets/arrowLeft.svg";
-import arrowRight from "../../public/assets/arrowRight.svg";
-import downloadFile from "../../public/assets/downloadFile.svg";
-import saveFile from "../../public/assets/saveFile.svg";
-import shareFile from "../../public/assets/shareFile.svg";
-import ReturnEditor from "../components/ReturnEditor";
-import InputEditor from "../components/InputEditor";
+import EditorAside from "../../components/EditorAside/EditorAside";
+import arrowLeft from "../../../public/assets/arrowLeft.svg";
+import arrowRight from "../../../public/assets/arrowRight.svg";
+import downloadFile from "../../../public/assets/downloadFile.svg";
+import saveFile from "../../../public/assets/saveFile.svg";
+import shareFile from "../../../public/assets/shareFile.svg";
+import ReturnEditor from "../../components/ReturnEditor";
+import InputEditor from "../../components/InputEditor/InputEditor";
 
 function EditorContainer() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -19,9 +19,12 @@ function EditorContainer() {
     setIsOpen(true);
   };
 
+  // TODO Fetch Project code
+
   return (
     <div className="flex flex-row h-full">
-      <EditorAside />
+      {/* TODO replace project name by fetched name */}
+      <EditorAside projectName='Project'  />
       <div className="px-8 py-8 h-full w-full flex flex-col">
         <div className="flex justify-between py-4">
           {/* TODO add dynamic path */}
@@ -54,7 +57,7 @@ function EditorContainer() {
             >
               <img
                 src={isOpen ? arrowRight : arrowLeft}
-                alt="arrow pointing in closing direction"
+                alt={isOpen ? "arrow pointing in opening direction" : "arrow pointing in opening direction"}
               />
             </button>
           </div>
