@@ -1,7 +1,12 @@
 import React from "react";
+import RegisterContainer from "../container/RegisterContainer";
 
 function RegisterScreen() {
-  return <div>RegisterScreen</div>;
+  return (
+    <section>
+      <RegisterContainer />
+    </section>
+  );
 }
 
 export default RegisterScreen;

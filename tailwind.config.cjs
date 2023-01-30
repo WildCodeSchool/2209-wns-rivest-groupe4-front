@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const defaultTheme = require("tailwindcss/defaultTheme");
+
 module.exports = {
   content: [
     "./index.html",
@@ -34,6 +36,7 @@ module.exports = {
       tablet: { min: "769px", max: "1000px" },
       desktopSmall: { min: "1001px", max: "1200px" },
       desktopLarge: { min: "1201px" },
+      ...defaultTheme.screens,
     },
   },
   plugins: [require("flowbite/plugin")],

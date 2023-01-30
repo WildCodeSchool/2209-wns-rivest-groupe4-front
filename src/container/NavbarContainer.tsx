@@ -7,7 +7,7 @@ function NavbarContainer() {
 
   return (
     <nav className="w-full h-fit flex flex-row justify-between border-b-2 items-center bg-black/30">
-      <NavLink to="/home" className="cursor-default">
+      <NavLink to="/" className="cursor-default">
         <img
           className="w-30 h-20 tablet:w-20 tablet:h-14 hover:cursor-pointer"
           src="assets/logo.png"

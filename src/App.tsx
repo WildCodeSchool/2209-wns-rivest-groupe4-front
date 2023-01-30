@@ -14,10 +14,11 @@ import UserSpaceScreen from "./screens/UserSpaceScreen";
 
 import "./index.css";
 import NavbarContainer from "./container/NavbarContainer";
+import MobileCodeEditorScreen from "./screens/MobileCodeEditorScreen";
 
 function App() {
   return (
-    <main className="flex flex-col w-full h-screen">
+    <main className="flex flex-col w-full h-screen relative">
       <NavbarContainer />
       <Routes>
         <Route path="/" element={<HomeScreen />} />
@@ -31,6 +32,10 @@ function App() {
         <Route path="/user-space" element={<UserSpaceScreen />} />
         <Route path="/premium" element={<PremiumScreen />} />
         <Route path="/redirect" element={<RedirectScreen />} />
+        <Route
+          path="/mobile-code-editor"
+          element={<MobileCodeEditorScreen />}
+        />
       </Routes>
     </main>
   );
