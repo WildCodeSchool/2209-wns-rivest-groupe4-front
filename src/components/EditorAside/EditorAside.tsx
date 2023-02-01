@@ -1,6 +1,10 @@
 import React from "react";
 
-function EditorAside() {
+interface Props {
+  projectName: string
+}
+
+function EditorAside({ projectName }: Props) {
   return (
     <aside
       className="w-[10%] bg-[#20252D]"
@@ -10,7 +14,7 @@ function EditorAside() {
       }}
     >
       {/* TODO add dynamic project name */}
-      <p>Project</p>
+      <p>{projectName || 'Project'}</p>
     </aside>
   );
 }
