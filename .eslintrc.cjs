@@ -28,6 +28,12 @@ module.exports = {
     "react/jsx-no-constructed-context-values": "off",
     "no-console": "off",
     "no-nested-ternary": "off",
+    "prettier/prettier": [
+      "error",
+      {
+        endOfLine: "auto",
+      },
+    ],
     "no-restricted-syntax": [
       "error",
       {

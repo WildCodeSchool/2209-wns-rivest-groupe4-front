@@ -1,7 +1,8 @@
 import React from "react";
+import SharesContainer from "../container/SharesContainer";
 
 function SharesScreen() {
-  return <div>SharesScreen</div>;
+  return <SharesContainer />;
 }
 
 export default SharesScreen;
