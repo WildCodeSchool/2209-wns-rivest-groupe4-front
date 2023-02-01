@@ -1,11 +1,11 @@
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 
-import EditorAside from './EditorAside';
+import EditorAside from "./EditorAside";
 
 describe("EditorAside component", () => {
   it("Shows relevant elements by default", () => {
-    const { getByText } = render(<EditorAside projectName='Project' />)
+    render(<EditorAside projectName="Project" />);
 
-    expect(getByText("Project")).toBeDefined();
+    expect(screen.getByText("Project")).toBeDefined();
   });
-})
+});
