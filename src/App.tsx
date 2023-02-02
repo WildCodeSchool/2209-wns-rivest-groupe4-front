@@ -15,6 +15,7 @@ import UserSpaceScreen from "./screens/UserSpaceScreen";
 import "./index.css";
 import NavbarContainer from "./container/NavbarContainer";
 import MobileCodeEditorScreen from "./screens/MobileCodeEditorScreen";
+import ChooseProjectScreen from "./screens/ChooseProjectScreen";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/register" element={<RegisterScreen />} />
         <Route path="/editor" element={<EditorScreen />} />
+        <Route path="/choose" element={<ChooseProjectScreen />} />
         <Route path="/projects" element={<ProjectsScreen />} />
         <Route path="/project-details" element={<ProjectDetailsScreen />} />
         <Route path="/contact" element={<ContactScreen />} />
