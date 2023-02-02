@@ -24,7 +24,7 @@ function EditorContainer() {
   return (
     <div className="flex flex-row h-full">
       {/* TODO replace project name by fetched name */}
-      <EditorAside projectName='Project'  />
+      <EditorAside projectName="Project" />
       <div className="px-8 py-8 h-full w-full flex flex-col">
         <div className="flex justify-between py-4">
           {/* TODO add dynamic path */}
@@ -57,7 +57,11 @@ function EditorContainer() {
             >
               <img
                 src={isOpen ? arrowRight : arrowLeft}
-                alt={isOpen ? "arrow pointing in opening direction" : "arrow pointing in opening direction"}
+                alt={
+                  isOpen
+                    ? "arrow pointing in opening direction"
+                    : "arrow pointing in opening direction"
+                }
               />
             </button>
           </div>

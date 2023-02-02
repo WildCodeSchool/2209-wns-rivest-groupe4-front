@@ -23,7 +23,7 @@ function NavbarContainer() {
           <li className="border-r-2 border-white p-6">Code Editor</li>
         </NavLink>
         <NavLink
-          to="/projects"
+          to="/shares"
           className={(navData) => (navData.isActive ? "bg-black/40" : "")}
           onClick={() => setOpened(false)}
         >

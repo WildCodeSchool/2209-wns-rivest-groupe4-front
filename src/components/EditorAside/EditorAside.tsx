@@ -1,7 +1,7 @@
 import React from "react";
 
 interface Props {
-  projectName: string
+  projectName: string;
 }
 
 function EditorAside({ projectName }: Props) {
@@ -14,7 +14,7 @@ function EditorAside({ projectName }: Props) {
       }}
     >
       {/* TODO add dynamic project name */}
-      <p>{projectName || 'Project'}</p>
+      <p>{projectName || "Project"}</p>
     </aside>
   );
 }
