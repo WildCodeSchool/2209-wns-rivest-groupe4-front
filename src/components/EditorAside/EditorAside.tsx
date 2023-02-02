@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import {
   ExistingProjectQueryResult,
   FolderTree,
-} from "../container/EditorContainer/types";
+} from "../../container/EditorContainer/types";
 
 interface Props {
   projectData: ExistingProjectQueryResult;

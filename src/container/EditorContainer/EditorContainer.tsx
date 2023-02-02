@@ -9,14 +9,14 @@ import {
 import React, { useState } from "react";
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
 
-import EditorAside from "../../components/EditorAside";
+import EditorAside from "../../components/EditorAside/EditorAside";
 import arrowLeft from "../../../public/assets/arrowLeft.svg";
 import arrowRight from "../../../public/assets/arrowRight.svg";
 import downloadFile from "../../../public/assets/downloadFile.svg";
 import saveFile from "../../../public/assets/saveFile.svg";
 import shareFile from "../../../public/assets/shareFile.svg";
 import ReturnEditor from "../../components/ReturnEditor";
-import InputEditor from "../../components/InputEditor";
+import InputEditor from "../../components/InputEditor/InputEditor";
 import {
   CreateNewProjectMutationResult,
   CreateNewProjectMutationVariables,
