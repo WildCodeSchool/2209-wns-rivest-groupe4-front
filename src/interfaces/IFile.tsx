@@ -1,5 +1,5 @@
 export default interface IFile {
-  id: number;
+  id?: number;
   name: string;
   content: string;
   extension: string;

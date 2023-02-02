@@ -1,24 +1,23 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import React, { useState } from "react";
-import {
-  ExistingProjectQueryResult,
-  FolderTree,
-} from "../../container/EditorContainer/types";
+import { ExistingProjectQueryResult } from "../../container/EditorContainer/types";
+import IFile from "../../interfaces/IFile";
+import IFolderTree from "../../interfaces/IFolderTree";
 
 interface Props {
   projectData: ExistingProjectQueryResult;
-  setCurrentFileContent: (content: string) => void;
+  setCurrentFile: (file: IFile) => void;
 }
 
 function Folder({
   folder,
   depth,
-  setCurrentFileContent,
+  setCurrentFile,
 }: {
-  folder: FolderTree;
+  folder: IFolderTree;
   depth: number;
-  setCurrentFileContent: (content: string) => void;
+  setCurrentFile: (file: IFile) => void;
 }) {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
@@ -30,7 +29,7 @@ function Folder({
       {!isCollapsed &&
         folder.files.map((file) => (
           <div
-            onClick={() => setCurrentFileContent(file.content)}
+            onClick={() => setCurrentFile(file)}
             key={`${file.content}-${file.name}-${file.extension}`}
             style={{ marginLeft: 20 }}
           >
@@ -43,16 +42,16 @@ function Folder({
 
 function Tree({
   tree,
-  setCurrentFileContent,
+  setCurrentFile,
 }: {
-  tree: FolderTree[];
-  setCurrentFileContent: (content: string) => void;
+  tree: IFolderTree[];
+  setCurrentFile: (file: IFile) => void;
 }) {
   return (
     <div>
       {tree.map((folder, index) => (
         <Folder
-          setCurrentFileContent={setCurrentFileContent}
+          setCurrentFile={setCurrentFile}
           key={folder.name}
           folder={folder}
           depth={index}
@@ -63,9 +62,9 @@ function Tree({
 }
 
 const createTree = (
-  folders: Array<FolderTree>,
+  folders: IFolderTree[],
   parentFolderId: string | null = null,
-): FolderTree[] => {
+): IFolderTree[] => {
   return folders
     .filter((folder) => folder.parentFolder === parentFolderId)
     .map((folder) => {
@@ -78,7 +77,7 @@ const createTree = (
     });
 };
 
-function EditorAside({ projectData, setCurrentFileContent }: Props) {
+function EditorAside({ projectData, setCurrentFile }: Props) {
   return (
     <aside
       className="w-[10%] bg-[#20252D]"
@@ -88,7 +87,7 @@ function EditorAside({ projectData, setCurrentFileContent }: Props) {
       }}
     >
       <Tree
-        setCurrentFileContent={setCurrentFileContent}
+        setCurrentFile={setCurrentFile}
         tree={createTree(projectData.getAllFoldersByProjectId)}
       />
     </aside>

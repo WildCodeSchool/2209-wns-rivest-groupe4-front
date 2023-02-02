@@ -6,7 +6,7 @@ import {
   Modal,
   TextInput,
 } from "flowbite-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
 
 import EditorAside from "../../components/EditorAside/EditorAside";
@@ -23,6 +23,7 @@ import {
   ExistingProjectQueryResult,
   ExistingProjectQueryVariables,
 } from "./types";
+import IFile from "../../interfaces/IFile";
 
 const CREATE_PROJECT = gql`
   mutation CreateProject(
@@ -74,6 +75,7 @@ interface Props {
 }
 
 function EditorContainer({ action, existingProjects }: Props) {
+  const [userID, setUserID] = useState<string | null>(null);
   // State to determine which modal to show
   const [createModal, setCreateModal] = useState<boolean>(action === "new");
   const [chooseModal, setChooseModal] = useState<boolean>(
@@ -82,7 +84,7 @@ function EditorContainer({ action, existingProjects }: Props) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   // State that defines the editors current value and the code to be sent as mutation input
-  const [currentFileContent, setCurrentFileContent] = useState<string>();
+  const [currentFile, setCurrentFile] = useState<IFile>();
   const [currentProject, setCurrentProject] =
     useState<ExistingProjectQueryResult | null>(null);
   const [editorValue, setEditorValue] = useState<string>("");
@@ -99,8 +101,7 @@ function EditorContainer({ action, existingProjects }: Props) {
     setIsOpen(true);
   };
 
-  // Defined a query to load an existing project
-  const [loadProject, { error: existingProjectError }] = useLazyQuery<
+  const [loadProject] = useLazyQuery<
     ExistingProjectQueryResult,
     ExistingProjectQueryVariables
   >(GET_CHOSEN_PROJECT, {
@@ -109,26 +110,14 @@ function EditorContainer({ action, existingProjects }: Props) {
     },
   });
 
-  if (existingProjectError) {
-    console.error(existingProjectError.message);
-  }
-
-  // TODO createProject mutation should return the initial project
-  // Defined a mutation to create a new project
-  const [
-    createProject,
-    {
-      data: newProjectData,
-      error: newProjectError,
-      loading: newProjectLoading,
-    },
-  ] = useMutation<
+  const [createProject, { data: newProjectData }] = useMutation<
     CreateNewProjectMutationResult,
     CreateNewProjectMutationVariables
   >(CREATE_PROJECT, {
     variables: {
-      // TODO replace uuid
-      userId: "930a55eb-73ec-4a96-8f83-5dd8552831e8",
+      // TODO regle a enlever une fois que l'accces a l'editeur sera reservee aux users login
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      userId: userID!,
       description: newProjectDescription,
       name: newProjectName,
       public: newProjectIsPublic,
@@ -141,7 +130,9 @@ function EditorContainer({ action, existingProjects }: Props) {
 
   const handleExistingProject = (projectID: number) => {
     loadProject({ variables: { id: Number(projectID) } });
-    setChooseModal(false);
+    if (chooseModal === true) {
+      setChooseModal(false);
+    }
   };
 
   const handleNewProject = () => {
@@ -150,13 +141,6 @@ function EditorContainer({ action, existingProjects }: Props) {
       console.warn(newProjectData);
       setCreateModal(false);
     }
-    if (newProjectError) {
-      console.warn(newProjectError);
-    }
-    if (newProjectLoading) {
-      console.warn(newProjectLoading);
-    }
-    console.warn(newProjectData);
   };
 
   const handleSave = () => {
@@ -170,6 +154,20 @@ function EditorContainer({ action, existingProjects }: Props) {
   const handleDownload = () => {
     // TODO download zip with project structure
   };
+
+  useEffect(() => {
+    if (action !== "new" && action !== "existing") {
+      handleExistingProject(Number(action));
+    }
+    if (localStorage.getItem("uuid")) {
+      setUserID(localStorage.getItem("uuid"));
+    }
+    if (existingProjects.length < 1) {
+      setChooseModal(false);
+      setCreateModal(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userID]);
 
   return (
     <div className="flex flex-row h-full">
@@ -237,18 +235,18 @@ function EditorContainer({ action, existingProjects }: Props) {
       )}
       {currentProject && (
         <EditorAside
-          setCurrentFileContent={setCurrentFileContent}
+          setCurrentFile={setCurrentFile}
           projectData={currentProject}
         />
       )}
       <div className="px-8 py-8 h-full w-full flex flex-col">
         <div className="flex justify-between py-4">
-          {/* TODO add dynamic path */}
           <p>
             {currentProject?.getOneProject.name
               ? currentProject?.getOneProject.name
               : "Project"}
-            &gt; index.js
+            &nbsp; &gt;{" "}
+            {currentFile ? `${currentFile.name}.${currentFile.extension}` : ""}
           </p>
           <Button onClick={handleEditorValidate} gradientDuoTone="cyanToBlue">
             Run
@@ -263,7 +261,7 @@ function EditorContainer({ action, existingProjects }: Props) {
         <div className="flex flex-row gap-8 h-full w-full">
           <div className="h-full w-full relative">
             <InputEditor
-              editorValue={currentFileContent || editorValue}
+              editorValue={currentFile ? currentFile.content : editorValue}
               setEditorValue={setEditorValue}
             />
             <button

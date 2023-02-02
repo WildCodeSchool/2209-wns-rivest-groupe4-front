@@ -1,3 +1,5 @@
+import IFolderTree from "../../interfaces/IFolderTree";
+
 export interface CreateNewProjectMutationResult {
   createProject: {
     id: number;
@@ -20,20 +22,9 @@ export interface CurrentProject {
 
 export interface ExistingProjectQueryResult {
   getOneProject: CurrentProject;
-  getAllFoldersByProjectId: FolderTree[];
+  getAllFoldersByProjectId: IFolderTree[];
 }
 
 export interface ExistingProjectQueryVariables {
   id: number;
-}
-
-export interface FolderTree {
-  id?: string;
-  parentFolder?: string | null;
-  name: string;
-  files: Array<{
-    content: string;
-    extension: string;
-    name: string;
-  }>;
 }
