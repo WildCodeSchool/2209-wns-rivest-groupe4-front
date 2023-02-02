@@ -16,7 +16,7 @@ function NavbarContainer() {
       </NavLink>
       <ul className="flex flex-row justify-between font-aldrich text-white text-lg tablet:text-sm  items-center color:white">
         <NavLink
-          to="/editor"
+          to="/choose"
           className={(navData) => (navData.isActive ? "bg-black/40" : "")}
           onClick={() => setOpened(false)}
         >
