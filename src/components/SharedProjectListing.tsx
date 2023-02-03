@@ -1,6 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import { Button } from "flowbite-react";
 import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import IProjectsListing from "../interfaces/IProjectsListing";
 
 const ADD_LIKE = gql`
@@ -29,6 +30,8 @@ function SharedProjectsListing({
       1,
   );
 
+  const navigate = useNavigate();
+
   const [likesCount, setLikesCount] = useState<number>(likes.length);
 
   const [addLike] = useMutation(ADD_LIKE, {
@@ -42,6 +45,10 @@ function SharedProjectsListing({
       setIsLiked(false);
     },
   });
+
+  const reloading = () => {
+    window.location.reload();
+  };
 
   const handleClickHeart = () => {
     if (localStorage.getItem("uuid") != null) {
@@ -64,14 +71,15 @@ function SharedProjectsListing({
         setIsLiked(true);
         setLikesCount(likesCount + 1);
       }
+      reloading();
     } else {
       alert("Please login or register to interract with projects :)"); // eslint-disable-line no-alert
     }
   };
 
-  const handleClickComment = () => {
+  const handleClickComment = (idClicked: number) => {
     if (localStorage.getItem("uuid") != null) {
-      console.warn("redirect detail");
+      navigate(`/project-details/${idClicked}`);
     } else {
       alert("Please login or register to interract with projects :)"); // eslint-disable-line no-alert
     }
@@ -97,7 +105,7 @@ function SharedProjectsListing({
               <p>{comments.length}</p>
               <img
                 role="presentation"
-                onClick={() => handleClickComment()}
+                onClick={() => handleClickComment(id)}
                 alt="comment"
                 className="cursor-pointer"
                 src="assets/comment-solid.svg"
@@ -123,18 +131,30 @@ function SharedProjectsListing({
             .join("/")} at ${updatedAt.toString().split("T")[1].split(".")[0]}`}
         </p>
         <p className="h-[150px]">{description}</p>
-        <div className="flex items-center justify-center ml-20">
+        <div className="flex items-center justify-between mx-8">
           <h1 className="bg-yellow-200 text-black px-2 rounded-sm font-bold">
             Javascript
           </h1>
-          <Button
-            type="submit"
-            disabled={localStorage.getItem("uuid") === null}
-            gradientDuoTone="cyanToBlue"
-            className="m-auto"
-          >
-            ACCESS THE PROJECT
-          </Button>
+          {localStorage.getItem("uuid") !== null ? (
+            <NavLink to={`/project-details/${id}`}>
+              <Button
+                type="submit"
+                gradientDuoTone="cyanToBlue"
+                className="m-auto"
+              >
+                ACCESS THE PROJECT
+              </Button>
+            </NavLink>
+          ) : (
+            <Button
+              type="submit"
+              gradientDuoTone="cyanToBlue"
+              disabled
+              className="m-auto"
+            >
+              ACCESS THE PROJECT
+            </Button>
+          )}
         </div>
       </div>
     </div>

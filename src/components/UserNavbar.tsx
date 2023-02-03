@@ -37,7 +37,7 @@ function UserNavbar({ opened, setOpened }: INavbarProps) {
                   <span>
                     <img
                       className="w-6 h-6 mr-2.5"
-                      src="assets/login.svg"
+                      src="/assets/login.svg"
                       alt="login"
                     />
                   </span>
@@ -54,7 +54,7 @@ function UserNavbar({ opened, setOpened }: INavbarProps) {
                   <span>
                     <img
                       className="w-6 h-6"
-                      src="assets/register.svg"
+                      src="/assets/register.svg"
                       alt="register"
                     />
                   </span>
@@ -102,7 +102,7 @@ function UserNavbar({ opened, setOpened }: INavbarProps) {
                   <span>
                     <img
                       className="w-6 h-6"
-                      src="assets/logout.svg"
+                      src="/assets/logout.svg"
                       alt="logout"
                     />
                   </span>
@@ -120,7 +120,7 @@ function UserNavbar({ opened, setOpened }: INavbarProps) {
           onClick={() => setOpened(!opened)}
           onKeyDown={() => setOpened(!opened)}
         >
-          <img className="w-8 h-8" src="assets/user.svg" alt="user" />
+          <img className="w-8 h-8" src="/assets/user.svg" alt="user" />
         </div>
       )}
     </div>
