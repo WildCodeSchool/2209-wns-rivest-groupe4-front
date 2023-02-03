@@ -126,7 +126,7 @@ function FolderTree({
             ) : null)}
           {folder.files &&
             folder.files.map((file) => (
-              <div onClick={() => setCurrentFile(file)} key={file.name}>
+              <div className='ml-4' onClick={() => setCurrentFile(file)} key={file.name}>
                 {file.name}.{file.extension}
               </div>
             ))}
