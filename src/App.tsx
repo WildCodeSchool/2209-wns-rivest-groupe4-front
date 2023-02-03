@@ -14,6 +14,7 @@ import UserSpaceScreen from "./screens/UserSpaceScreen";
 import "./index.css";
 import NavbarContainer from "./container/NavbarContainer";
 import MobileCodeEditorScreen from "./screens/MobileCodeEditorScreen";
+import ChooseProjectScreen from "./screens/ChooseProjectScreen";
 
 function App() {
   return (
@@ -24,10 +25,12 @@ function App() {
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/register" element={<RegisterScreen />} />
         <Route path="/editor" element={<EditorScreen />} />
+
         <Route
           path="/project-details/:idProject"
           element={<ProjectDetailsScreen />}
         />
+        <Route path="/choose" element={<ChooseProjectScreen />} />
         <Route path="/contact" element={<ContactScreen />} />
         <Route path="/shares" element={<SharesScreen />} />
         <Route path="/user-space" element={<UserSpaceScreen />} />
