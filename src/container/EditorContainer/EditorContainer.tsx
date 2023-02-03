@@ -87,7 +87,6 @@ function EditorContainer({ action, existingProjects }: Props) {
   const [currentFile, setCurrentFile] = useState<IFile>();
   const [currentProject, setCurrentProject] =
     useState<ExistingProjectQueryResult | null>(null);
-  const [editorValue, setEditorValue] = useState<string>("");
   const [codeToRun, setCodeToRun] = useState<string>("");
 
   // State for new project inputs
@@ -97,7 +96,9 @@ function EditorContainer({ action, existingProjects }: Props) {
   const [newProjectIsPublic, setNewProjectIsPublic] = useState<boolean>(false);
 
   const handleEditorValidate = () => {
-    setCodeToRun(editorValue);
+    if (currentFile) {
+      setCodeToRun(currentFile?.content);
+    }
     setIsOpen(true);
   };
 
@@ -261,8 +262,17 @@ function EditorContainer({ action, existingProjects }: Props) {
         <div className="flex flex-row gap-8 h-full w-full">
           <div className="h-full w-full relative">
             <InputEditor
-              editorValue={currentFile ? currentFile.content : editorValue}
-              setEditorValue={setEditorValue}
+              editorValue={currentFile ? currentFile.content : ""}
+              setEditorValue={(e) => {
+                if (currentFile) {
+                  setCurrentFile({
+                    id: currentFile.id,
+                    name: currentFile.name,
+                    extension: currentFile.extension,
+                    content: e,
+                  });
+                }
+              }}
             />
             <button
               type="button"
