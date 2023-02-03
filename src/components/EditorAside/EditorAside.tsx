@@ -53,7 +53,11 @@ function FolderTree({
   };
 
   const handleCollapsable = (folderId: string) => {
-    setIsCollapsed(folderId);
+    if (isCollapsed === folderId) {
+      setIsCollapsed('')
+    } else {
+      setIsCollapsed(folderId);
+    }
   };
 
   return (
@@ -117,7 +121,7 @@ function FolderTree({
               </div>
             )}
           </div>
-          {folder.children &&
+          {folder.children && isCollapsed === folder.id &&
             (openFolders.includes(folder.id) ? (
               <FolderTree
                 setCurrentFile={setCurrentFile}
