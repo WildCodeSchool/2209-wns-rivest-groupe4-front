@@ -13,7 +13,7 @@ import EditorAside from "../../components/EditorAside/EditorAside";
 import arrowLeft from "../../../public/assets/arrowLeft.svg";
 import arrowRight from "../../../public/assets/arrowRight.svg";
 import downloadFile from "../../../public/assets/downloadFile.svg";
-import saveFile from "../../../public/assets/saveFile.svg";
+import saveFileImg from "../../../public/assets/saveFile.svg";
 import shareFile from "../../../public/assets/shareFile.svg";
 import ReturnEditor from "../../components/ReturnEditor";
 import InputEditor from "../../components/InputEditor/InputEditor";
@@ -61,11 +61,28 @@ const GET_CHOSEN_PROJECT = gql`
         id
       }
       files {
+        id
         content
         extension
         name
       }
     }
+  }
+`;
+
+const SAVE_PROJECT = gql`
+  mutation ModifyFile(
+    $idFile: Float!
+    $fileName: String
+    $fileContent: String
+    $fileExtension: String
+  ) {
+    modifyFile(
+      idFile: $idFile
+      name: $fileName
+      content: $fileContent
+      extension: $fileExtension
+    )
   }
 `;
 
@@ -101,6 +118,15 @@ function EditorContainer({ action, existingProjects }: Props) {
     }
     setIsOpen(true);
   };
+
+  const [saveFile] = useMutation(SAVE_PROJECT, {
+    variables: {
+      idFile: Number(currentFile?.id),
+      fileName: currentFile?.name,
+      fileExtension: currentFile?.extension,
+      fileContent: currentFile?.content,
+    },
+  });
 
   const [loadProject] = useLazyQuery<
     ExistingProjectQueryResult,
@@ -145,7 +171,9 @@ function EditorContainer({ action, existingProjects }: Props) {
   };
 
   const handleSave = () => {
-    // TODO mutation to update Project in database
+    if (currentFile) {
+      saveFile();
+    }
   };
 
   const handleShare = () => {
@@ -154,6 +182,11 @@ function EditorContainer({ action, existingProjects }: Props) {
 
   const handleDownload = () => {
     // TODO download zip with project structure
+  };
+
+  const handleRun = () => {
+    setIsOpen(!isOpen);
+    saveFile();
   };
 
   useEffect(() => {
@@ -249,12 +282,20 @@ function EditorContainer({ action, existingProjects }: Props) {
             &nbsp; &gt;{" "}
             {currentFile ? `${currentFile.name}.${currentFile.extension}` : ""}
           </p>
-          <Button onClick={handleEditorValidate} gradientDuoTone="cyanToBlue">
+          <Button
+            onClick={() => {
+              handleRun();
+              handleEditorValidate();
+            }}
+            gradientDuoTone="cyanToBlue"
+          >
             Run
           </Button>
           <div className="flex gap-4">
             {/* TODO add actions */}
-            <img src={saveFile} alt="save file" />
+            <button type="button" onClick={() => handleSave()}>
+              <img src={saveFileImg} alt="save file" />
+            </button>
             <img src={downloadFile} alt="download file" />
             <img src={shareFile} alt="share file" />
           </div>
@@ -282,7 +323,7 @@ function EditorContainer({ action, existingProjects }: Props) {
                 zIndex: 2,
               }}
               className="px-2 py-2 bg-[#20252D] absolute"
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => handleRun()}
             >
               <img
                 src={isOpen ? arrowRight : arrowLeft}

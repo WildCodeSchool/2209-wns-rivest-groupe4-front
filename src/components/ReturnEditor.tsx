@@ -12,11 +12,14 @@ const POST_CODE = gql`
   }
 `;
 
+export const encodeBase64 = (data: string) => {
+  return Buffer.from(data).toString("base64");
+};
+
 function ReturnEditor({ codeToQuery }: Props) {
   const [returnedValue, setReturnedValue] = useState<string>("");
-
   const { loading, error, data } = useQuery(POST_CODE, {
-    variables: { code: codeToQuery },
+    variables: { code: btoa(codeToQuery) },
   });
 
   useEffect(() => {
