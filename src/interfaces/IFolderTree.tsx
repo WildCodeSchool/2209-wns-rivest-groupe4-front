@@ -1,8 +1,14 @@
-import IFile from "./IFile";
-
-export default interface FolderTree {
-  id?: string;
-  parentFolder?: string | null;
+export default interface IFolderTree {
   name: string;
-  files: IFile[];
+  id: string;
+  parentFolder?: {
+    name: string;
+    id: string;
+  };
+  children?: IFolderTree[];
+  files?: Array<{
+    content: string;
+    extension: string;
+    name: string;
+  }>;
 }
