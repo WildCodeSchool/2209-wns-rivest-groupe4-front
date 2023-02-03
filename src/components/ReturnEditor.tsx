@@ -16,7 +16,7 @@ function ReturnEditor({ codeToQuery }: Props) {
   const [returnedValue, setReturnedValue] = useState<string>("");
 
   const { loading, error, data } = useQuery(POST_CODE, {
-    variables: { code: codeToQuery },
+    variables: { code: btoa(codeToQuery) },
   });
 
   useEffect(() => {
