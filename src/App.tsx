@@ -6,7 +6,6 @@ import ContactScreen from "./screens/ContactScreen";
 import EditorScreen from "./screens/EditorScreen";
 import PremiumScreen from "./screens/PremiumScreen";
 import ProjectDetailsScreen from "./screens/ProjectDetailsScreen";
-import ProjectsScreen from "./screens/ProjectsScreen";
 import RedirectScreen from "./screens/RedirectScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import SharesScreen from "./screens/SharesScreen";
@@ -25,8 +24,10 @@ function App() {
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/register" element={<RegisterScreen />} />
         <Route path="/editor" element={<EditorScreen />} />
-        <Route path="/projects" element={<ProjectsScreen />} />
-        <Route path="/project-details" element={<ProjectDetailsScreen />} />
+        <Route
+          path="/project-details/:idProject"
+          element={<ProjectDetailsScreen />}
+        />
         <Route path="/contact" element={<ContactScreen />} />
         <Route path="/shares" element={<SharesScreen />} />
         <Route path="/user-space" element={<UserSpaceScreen />} />

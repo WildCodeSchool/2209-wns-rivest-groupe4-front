@@ -10,7 +10,7 @@ function NavbarContainer() {
       <NavLink to="/" className="cursor-default">
         <img
           className="w-30 h-20 tablet:w-20 tablet:h-14 hover:cursor-pointer"
-          src="assets/logo.png"
+          src="/assets/logo.png"
           alt="logo"
         />
       </NavLink>

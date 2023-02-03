@@ -1,3 +1,4 @@
+import IFile from "./IFile";
 import IProject from "./IProject";
 
 export default interface IFolder {
@@ -5,5 +6,5 @@ export default interface IFolder {
   name: string;
   parentFolder?: IFolder;
   project: IProject;
-  files: File[];
+  files: IFile[];
 }
