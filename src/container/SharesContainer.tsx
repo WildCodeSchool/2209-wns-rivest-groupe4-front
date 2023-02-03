@@ -11,6 +11,7 @@ const GET_SHARED_PROJECTS = gql`
       name
       description
       updatedAt
+      isPublic
       user {
         pseudo
       }
@@ -226,6 +227,7 @@ function SharesContainer() {
           user={el.user}
           comments={el.comments}
           likes={el.likes}
+          isPublic={el.isPublic}
         />
       ))}
     </div>

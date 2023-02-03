@@ -10,4 +10,6 @@ export default interface IProjectsListing {
   user: IUser;
   likes: ILike[];
   comments: IComment[];
+  isUserProject?: boolean;
+  isPublic: boolean;
 }

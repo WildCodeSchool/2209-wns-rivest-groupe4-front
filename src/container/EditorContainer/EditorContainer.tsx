@@ -143,14 +143,17 @@ function EditorContainer({ action, existingProjects }: Props) {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSave = () => {
     // TODO mutation to update Project in database
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleShare = () => {
     // TODO create hashed link userID and projectID
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDownload = () => {
     // TODO download zip with project structure
   };

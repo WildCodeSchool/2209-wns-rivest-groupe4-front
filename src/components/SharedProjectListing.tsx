@@ -1,6 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import { Button } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import IProjectsListing from "../interfaces/IProjectsListing";
 
@@ -24,15 +24,25 @@ function SharedProjectsListing({
   user,
   likes,
   comments,
+  isPublic,
+  isUserProject = false,
 }: IProjectsListing) {
-  const [isLiked, setIsLiked] = useState<boolean>(
-    likes.filter((el) => el.user.id === localStorage.getItem("uuid")).length >=
-      1,
-  );
+  const [isLiked, setIsLiked] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
-  const [likesCount, setLikesCount] = useState<number>(likes.length);
+  const [likesCount, setLikesCount] = useState<number>(0);
+
+  useEffect(() => {
+    if (likes) {
+      setIsLiked(
+        likes.filter((el) => el.user.id === localStorage.getItem("uuid"))
+          .length >= 1,
+      );
+
+      setLikesCount(likes.length);
+    }
+  }, [likes]);
 
   const [addLike] = useMutation(ADD_LIKE, {
     onCompleted() {
@@ -86,10 +96,18 @@ function SharedProjectsListing({
   };
 
   return (
-    <div className="flex flex-row justify-start items-center gap-10 w-full h-fit">
+    <div className="flex flex-row justify-start items-center gap-10 w-full h-fit mb-8">
       <div className="flex flex-col justify-start items-center gap-2 w-1/2">
         <div className="flex flex-row justify-between items-center w-full">
-          <h1 className="text-3xl font-aldrich">{user.pseudo}</h1>
+          <h1
+            className={
+              isUserProject
+                ? "text-3xl font-aldrich underline"
+                : "text-3xl font-aldrich"
+            }
+          >
+            {isUserProject ? name : user.pseudo}
+          </h1>
           <div className="flex gap-16 mx-4">
             <div className="flex gap-2 items-center">
               <p>{likesCount}</p>
@@ -116,12 +134,27 @@ function SharedProjectsListing({
         <img className="h-[300px] w-full" alt="img" src="assets/code.jpg" />
       </div>
       <div className="flex flex-col justify-start w-1/2 gap-5 h-full p-6">
-        <h1 className="text-3xl underline font-barlow font-semibold">
-          {`${name.split("")[0].toUpperCase()}${name
-            .split("")
-            .filter((el, index) => index !== 0)
-            .join("")}`}
-        </h1>
+        {!isUserProject ? (
+          <h1 className="text-3xl underline font-barlow font-semibold">
+            {`${name.split("")[0].toUpperCase()}${name
+              .split("")
+              .filter((el, index) => index !== 0)
+              .join("")}`}
+          </h1>
+        ) : isPublic ? (
+          <div className="flex w-full justify-end items-center gap-3">
+            <h1 className="font-bold">Public</h1>
+            <input type="checkbox" checked />
+          </div>
+        ) : (
+          isUserProject &&
+          !isPublic && (
+            <div className="flex w-full justify-end items-center gap-3">
+              <h1 className="font-bold">Private</h1>
+              <input type="checkbox" />
+            </div>
+          )
+        )}
         <p>
           {`${updatedAt
             .toString()
