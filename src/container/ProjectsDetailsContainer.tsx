@@ -296,7 +296,7 @@ function ProjectDetailsContainer() {
   };
 
   const handleDeleteComment = (id: number) => {
-    // eslint-disable-next-line no-restricted-globals
+    // eslint-disable-next-line no-restricted-globals, no-alert
     if (confirm("Voulez-vous supprimer ce message ?")) {
       deleteComment({
         variables: {

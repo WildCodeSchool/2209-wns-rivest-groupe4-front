@@ -1,7 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import { Button } from "flowbite-react";
 import { useState } from "react";
-import { NavLink, redirect, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import IProjectsListing from "../interfaces/IProjectsListing";
 
 const ADD_LIKE = gql`
