@@ -36,7 +36,7 @@ const CREATE_PROJECT = gql`
       userId: $userId
       description: $description
       name: $name
-      public: $public
+      isPublic: $public
     ) {
       id
     }
@@ -50,7 +50,7 @@ const GET_CHOSEN_PROJECT = gql`
       description
       createdAt
       name
-      public
+      isPublic
       updatedAt
     }
     getAllFoldersByProjectId(idProject: $id) {

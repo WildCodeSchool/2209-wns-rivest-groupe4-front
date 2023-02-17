@@ -1,5 +1,5 @@
-import { gql, useLazyQuery, useMutation } from "@apollo/client";
-import { useEffect, useState } from "react";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import { useState } from "react";
 import { Button } from "flowbite-react";
 import { useNavigate, useParams } from "react-router-dom";
 import IProjectsListing from "../interfaces/IProjectsListing";
@@ -12,6 +12,7 @@ const GET_PROJECT_BY_ID = gql`
       comments {
         comment
         createdAt
+        updatedAt
         user {
           pseudo
         }
@@ -27,6 +28,7 @@ const GET_PROJECT_BY_ID = gql`
       name
       updatedAt
       user {
+        id
         pseudo
       }
     }
@@ -57,6 +59,7 @@ const GET_COMMENTS_BY_IDPROJECT = gql`
       id
       comment
       createdAt
+      updatedAt
       user {
         id
         pseudo
@@ -79,16 +82,21 @@ const MODIFY_COMMENT = gql`
 `;
 
 const ADD_COMMENT = gql`
-  mutation Mutation(
-    $addCommentIdProject2: Float!
-    $comment: String!
-    $idUser: String!
-  ) {
-    addComment(
-      idProject: $addCommentIdProject2
-      comment: $comment
-      idUser: $idUser
-    )
+  mutation Mutation($idProject: Float!, $comment: String!, $idUser: String!) {
+    addComment(idProject: $idProject, comment: $comment, idUser: $idUser) {
+      comment
+      createdAt
+      id
+      updatedAt
+      user {
+        premium
+        id
+        pseudo
+      }
+      project {
+        id
+      }
+    }
   }
 `;
 
@@ -129,21 +137,58 @@ function ProjectDetailsContainer() {
     },
   });
 
-  const [addComment] = useMutation(ADD_COMMENT, {
-    onCompleted() {
+  const [addCommentary] = useMutation(ADD_COMMENT, {
+    onCompleted(data: { addComment: IComment }) {
+      const newComment: IComment = {
+        id: data.addComment?.id,
+        comment: data.addComment?.comment,
+        createdAt: data.addComment?.createdAt,
+        project: data.addComment?.project,
+        updatedAt: data.addComment?.updatedAt,
+        user: data.addComment?.user,
+      };
+      if (comments) {
+        setComments([newComment, ...comments]);
+      } else {
+        setComments([newComment]);
+      }
       setUserComment("");
     },
   });
 
   const [modifyComment] = useMutation(MODIFY_COMMENT, {
     onCompleted() {
+      if (comments) {
+        const newComments = [...comments];
+        for (let i = 0; i < newComments?.length; i += 1) {
+          if (newComments[i].id === commentEdition) {
+            newComments[i] = {
+              id: newComments[i].id,
+              comment: userCommentModify,
+              updatedAt: new Date(),
+              createdAt: newComments[i].createdAt,
+              project: newComments[i].project,
+              user: newComments[i].user,
+            };
+          }
+        }
+        setComments(newComments.sort((a, b) => b.id - a.id));
+      }
       setCommentEdition(null);
     },
   });
 
   const [deleteComment] = useMutation(DELETE_COMMENT);
 
-  const [getFolders] = useLazyQuery(GET_FOLDER_BY_IDPROJECT, {
+  useQuery(GET_COMMENTS_BY_IDPROJECT, {
+    variables: { getAllCommentsByProjectIdIdProject: Number(idProject) },
+    onCompleted(data: { getAllCommentsByProjectId: IComment[] }) {
+      const newComments = [...data.getAllCommentsByProjectId];
+      setComments(newComments.sort((a, b) => b.id - a.id));
+    },
+  });
+
+  useQuery(GET_FOLDER_BY_IDPROJECT, {
     variables: { idProject: Number(idProject) },
     onCompleted(data: { getAllFoldersByProjectId: IFolder[] }) {
       setFolders(
@@ -161,7 +206,7 @@ function ProjectDetailsContainer() {
     },
   });
 
-  const [getProject, { error }] = useLazyQuery(GET_PROJECT_BY_ID, {
+  useQuery(GET_PROJECT_BY_ID, {
     variables: { getOneProjectId: Number(idProject) },
     onCompleted(data: { getOneProject: IProjectsListing }) {
       setProjectDetails(data.getOneProject);
@@ -174,42 +219,20 @@ function ProjectDetailsContainer() {
     },
   });
 
-  const [getComments] = useLazyQuery(GET_COMMENTS_BY_IDPROJECT, {
-    variables: { getAllCommentsByProjectIdIdProject: Number(idProject) },
-    onCompleted(data: { getAllCommentsByProjectId: IComment[] }) {
-      setComments(data.getAllCommentsByProjectId);
-    },
-  });
-
-  useEffect(() => {
-    getProject();
-    getFolders();
-    getComments();
-  }, [getProject, getFolders, getComments]);
-
   const navigate = useNavigate();
 
   const goBack = () => {
     navigate(-1);
   };
 
-  if (error) {
-    goBack();
-  }
-
-  const reloading = () => {
-    window.location.reload();
-  };
-
   const postComment = () => {
-    addComment({
+    addCommentary({
       variables: {
-        addCommentIdProject2: Number(idProject),
+        idProject: Number(idProject),
         comment: userComment,
         idUser: localStorage.getItem("uuid"),
       },
     });
-    reloading();
   };
 
   const dateFormat = (date: Date): string => {
@@ -225,27 +248,27 @@ function ProjectDetailsContainer() {
         ? "hour"
         : "minute";
     if (unit === "minute") {
-      return diff / 60 > 1
+      return Math.floor(diff / 60) > 1
         ? `${Math.floor(diff / 60)} minutes ago`
         : `1 minute ago`;
     }
     if (unit === "hour") {
-      return diff / 60 / 60 > 1
+      return Math.floor(diff / 60 / 60) > 1
         ? `${Math.floor(diff / 60 / 60)} hours ago`
         : `1 hour ago`;
     }
     if (unit === "day") {
-      return diff / 60 / 60 / 24 > 1
+      return Math.floor(diff / 60 / 60 / 24) > 1
         ? `${Math.floor(diff / 60 / 60 / 24)} days ago`
         : `yesterday`;
     }
     if (unit === "month") {
-      return diff / 60 / 60 / 24 / 30.44 > 1
+      return Math.floor(diff / 60 / 60 / 24 / 30.44) > 1
         ? `${Math.floor(diff / 60 / 60 / 24 / 30.44)} months ago`
         : `1 month ago`;
     }
     if (unit === "year") {
-      return diff / 60 / 60 / 24 / 30.44 / 24 > 1
+      return Math.floor(diff / 60 / 60 / 24 / 30.44 / 24) > 1
         ? `${Math.floor(diff / 60 / 60 / 24 / 30.44 / 24)} years ago`
         : `1 year ago`;
     }
@@ -257,26 +280,32 @@ function ProjectDetailsContainer() {
   };
 
   const handleClickHeart = () => {
-    if (isLiked) {
-      deleteLike({
-        variables: {
-          idProject: Number(idProject),
-          idUser: localStorage.getItem("uuid"),
-        },
-      });
-      setIsLiked(false);
-      setLikesCount(likesCount - 1);
+    if (
+      projectDetails &&
+      projectDetails.user.id !== localStorage.getItem("uuid")
+    ) {
+      if (isLiked) {
+        deleteLike({
+          variables: {
+            idProject: Number(idProject),
+            idUser: localStorage.getItem("uuid"),
+          },
+        });
+        setIsLiked(false);
+        setLikesCount(likesCount - 1);
+      } else {
+        addLike({
+          variables: {
+            idProject: Number(idProject),
+            idUser: localStorage.getItem("uuid"),
+          },
+        });
+        setIsLiked(true);
+        setLikesCount(likesCount + 1);
+      }
     } else {
-      addLike({
-        variables: {
-          idProject: Number(idProject),
-          idUser: localStorage.getItem("uuid"),
-        },
-      });
-      setIsLiked(true);
-      setLikesCount(likesCount + 1);
+      alert("This is your project, you can't add like on it"); // eslint-disable-line no-alert
     }
-    reloading();
   };
 
   const handleConfirmModifyComment = (id: number) => {
@@ -303,7 +332,10 @@ function ProjectDetailsContainer() {
           idComment: Number(id),
         },
       });
-      reloading();
+      if (comments) {
+        const newComments = comments?.filter((el) => el.id !== id);
+        setComments(newComments);
+      }
     }
   };
 
@@ -432,69 +464,87 @@ function ProjectDetailsContainer() {
       </div>
       <div className="flex flex-col w-full">
         <h1 className="text-xl pb-2">Commentaries :</h1>
-        <div className="flex flex-col h-fit bg-[#232323] border-white border-2 ">
+        <div className="flex flex-col h-fit min-h-[150px] bg-[#232323] border-white border-2 ">
           {comments &&
-            comments.map((el, index) => (
-              <div
-                key={el.id}
-                className={`flex flex-col w-full pb-4 ${
-                  index !== comments.length - 1 && "border-b-2 border-white"
-                }`}
-              >
-                <div className="flex justify-between">
-                  <div className="flex gap-2 p-4">
-                    <h1>{el.user.pseudo}</h1>
-                    <span>-</span>
-                    <h1>{dateFormat(new Date(el.createdAt))}</h1>
-                  </div>
-                  {el.user.id === localStorage.getItem("uuid") && (
-                    <div className="flex" key={el.id}>
-                      {commentEdition && commentEdition === el.id ? (
-                        <img
-                          role="presentation"
-                          alt="validate"
-                          src="/assets/check-solid.svg"
-                          className="w-8 p-1 m-2 cursor-pointer"
-                          onClick={() => {
-                            handleConfirmModifyComment(el.id);
-                          }}
-                        />
-                      ) : (
+            comments
+              .filter(
+                (el, index) => Math.floor(index / 10) === pageSelected - 1,
+              )
+              .map((el, index) => (
+                <div
+                  key={el.id}
+                  className={`flex flex-col w-full pb-4 ${
+                    index !== comments.length - 1 && "border-b-2 border-white"
+                  }`}
+                >
+                  <div className="flex justify-between">
+                    <div className="flex gap-2 p-4 items-center">
+                      <h1
+                        className={
+                          el.user.id === localStorage.getItem("uuid")
+                            ? "text-lime-600 font-semibold"
+                            : el.user.premium
+                            ? "bg-gradient-to-r bg-clip-text text-transparent from-orange-800 via-orange-500 to-yellow-600 animate-premiumColorChanging font-semibold"
+                            : "font-semibold"
+                        }
+                      >
+                        {el.user.pseudo}
+                      </h1>
+                      <span>-</span>
+                      <h1>{dateFormat(new Date(el.createdAt))}</h1>
+                      {new Date(el.createdAt).getTime() !==
+                        new Date(el.updatedAt).getTime() && (
+                        <p className="text-xs pt-1 text-white/60">(modified)</p>
+                      )}
+                    </div>
+                    {el.user.id === localStorage.getItem("uuid") && (
+                      <div className="flex" key={el.id}>
+                        {commentEdition && commentEdition === el.id ? (
+                          <img
+                            role="presentation"
+                            alt="validate"
+                            src="/assets/check-solid.svg"
+                            className="w-8 p-1 m-2 cursor-pointer"
+                            onClick={() => {
+                              handleConfirmModifyComment(el.id);
+                            }}
+                          />
+                        ) : (
+                          <img
+                            role="presentation"
+                            alt="edit"
+                            src="/assets/pen-solid.svg"
+                            className="w-6 p-1 m-2 cursor-pointer"
+                            onClick={() => {
+                              handleModifyComment(el.id);
+                            }}
+                          />
+                        )}
                         <img
                           role="presentation"
                           alt="edit"
-                          src="/assets/pen-solid.svg"
-                          className="w-6 p-1 m-2 cursor-pointer"
+                          src="/assets/xmark-solid.svg"
+                          className="w-6 p-1 my-1 mx-3 cursor-pointer"
                           onClick={() => {
-                            handleModifyComment(el.id);
+                            handleDeleteComment(el.id);
                           }}
                         />
-                      )}
-                      <img
-                        role="presentation"
-                        alt="edit"
-                        src="/assets/xmark-solid.svg"
-                        className="w-6 p-1 my-1 mx-3 cursor-pointer"
-                        onClick={() => {
-                          handleDeleteComment(el.id);
-                        }}
-                      />
-                    </div>
+                      </div>
+                    )}
+                  </div>
+                  {commentEdition && commentEdition === el.id ? (
+                    <textarea
+                      value={userCommentModify}
+                      onChange={(e) => handleChangeComment(e)}
+                      className="p-4 bg-[#232323] min-h-16 h-fit text-white"
+                    >
+                      {userCommentModify}
+                    </textarea>
+                  ) : (
+                    <p className="p-4 min-h-16 h-fit">{el.comment}</p>
                   )}
                 </div>
-                {commentEdition && commentEdition === el.id ? (
-                  <textarea
-                    value={userCommentModify}
-                    onChange={(e) => handleChangeComment(e)}
-                    className="p-4 bg-[#232323] min-h-16 h-fit text-white"
-                  >
-                    {userCommentModify}
-                  </textarea>
-                ) : (
-                  <p className="p-4 min-h-16 h-fit">{el.comment}</p>
-                )}
-              </div>
-            ))}
+              ))}
         </div>
       </div>
       <div className="flex justify-center items-center gap-3 my-5">

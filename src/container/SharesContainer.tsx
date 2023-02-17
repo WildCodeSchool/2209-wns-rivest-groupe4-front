@@ -1,6 +1,6 @@
 import { gql, useLazyQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import SharedProjectsListing from "../components/SharedProjectListing";
+import ProjectsListing from "../components/ProjectListing";
 import IProjectsListing from "../interfaces/IProjectsListing";
 import IOptionsSelected from "../interfaces/IOptionsSelected";
 
@@ -13,7 +13,9 @@ const GET_SHARED_PROJECTS = gql`
       updatedAt
       isPublic
       user {
+        id
         pseudo
+        premium
       }
       likes {
         user {
@@ -154,7 +156,7 @@ function SharesContainer() {
   return (
     <div className="flex flex-col h-full gap-10 mx-32 my-10">
       <div className="flex flex-row gap-40 mb-8">
-        <h1 className="w-1/5 font-aldrich text-6xl">Code With The Bests</h1>
+        <h1 className="w-1/5 font-aldrich text-6xl">Code With The Best</h1>
         <div className="flex flex-col gap-10 w-2/3">
           <input
             className="w-full px-2 py-2 rounded text-black"
@@ -218,7 +220,7 @@ function SharesContainer() {
         </div>
       </div>
       {projectsSharedFiltered.map((el) => (
-        <SharedProjectsListing
+        <ProjectsListing
           id={el.id}
           key={`sharedProject${el.id}`}
           name={el.name}

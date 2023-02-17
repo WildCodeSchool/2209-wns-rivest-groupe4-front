@@ -16,7 +16,13 @@ const DELETE_LIKE = gql`
   }
 `;
 
-function SharedProjectsListing({
+const MODIFY_PROJECT_PRIVACY = gql`
+  mutation Mutation($modifyProjectId: Float!, $public: Boolean) {
+    modifyProject(id: $modifyProjectId, public: $public)
+  }
+`;
+
+function ProjectsListing({
   id,
   name,
   description,
@@ -28,6 +34,7 @@ function SharedProjectsListing({
   isUserProject = false,
 }: IProjectsListing) {
   const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [isPublicProject, setIsPublicProject] = useState<boolean>(isPublic);
 
   const navigate = useNavigate();
 
@@ -39,7 +46,6 @@ function SharedProjectsListing({
         likes.filter((el) => el.user.id === localStorage.getItem("uuid"))
           .length >= 1,
       );
-
       setLikesCount(likes.length);
     }
   }, [likes]);
@@ -50,38 +56,52 @@ function SharedProjectsListing({
     },
   });
 
+  const [changePrivacy] = useMutation(MODIFY_PROJECT_PRIVACY, {
+    onCompleted() {
+      setIsPublicProject(!isPublicProject);
+    },
+  });
+
+  const handleChangePrivacy = () => {
+    changePrivacy({
+      variables: {
+        modifyProjectId: Number(id),
+        public: !isPublicProject,
+      },
+    });
+  };
+
   const [deleteLike] = useMutation(DELETE_LIKE, {
     onCompleted() {
       setIsLiked(false);
     },
   });
 
-  const reloading = () => {
-    window.location.reload();
-  };
-
   const handleClickHeart = () => {
     if (localStorage.getItem("uuid") != null) {
-      if (isLiked) {
-        deleteLike({
-          variables: {
-            idProject: Number(id),
-            idUser: localStorage.getItem("uuid"),
-          },
-        });
-        setIsLiked(false);
-        setLikesCount(likesCount - 1);
+      if (user.id !== localStorage.getItem("uuid")) {
+        if (isLiked) {
+          deleteLike({
+            variables: {
+              idProject: Number(id),
+              idUser: localStorage.getItem("uuid"),
+            },
+          });
+          setIsLiked(false);
+          setLikesCount(likesCount - 1);
+        } else {
+          addLike({
+            variables: {
+              idProject: Number(id),
+              idUser: localStorage.getItem("uuid"),
+            },
+          });
+          setIsLiked(true);
+          setLikesCount(likesCount + 1);
+        }
       } else {
-        addLike({
-          variables: {
-            idProject: Number(id),
-            idUser: localStorage.getItem("uuid"),
-          },
-        });
-        setIsLiked(true);
-        setLikesCount(likesCount + 1);
+        alert("This is your project, you can't add like on it"); // eslint-disable-line no-alert
       }
-      reloading();
     } else {
       alert("Please login or register to interract with projects :)"); // eslint-disable-line no-alert
     }
@@ -103,7 +123,11 @@ function SharedProjectsListing({
             className={
               isUserProject
                 ? "text-3xl font-aldrich underline"
-                : "text-3xl font-aldrich"
+                : user.id === localStorage.getItem("uuid")
+                ? "text-lime-600  text-3xl font-aldrich "
+                : user.premium
+                ? "bg-gradient-to-r bg-clip-text text-transparent from-orange-800 via-orange-500 to-yellow-600 animate-premiumColorChanging text-3xl font-aldrich "
+                : "text-3xl font-aldrich "
             }
           >
             {isUserProject ? name : user.pseudo}
@@ -141,17 +165,29 @@ function SharedProjectsListing({
               .filter((el, index) => index !== 0)
               .join("")}`}
           </h1>
-        ) : isPublic ? (
+        ) : isPublicProject ? (
           <div className="flex w-full justify-end items-center gap-3">
-            <h1 className="font-bold">Public</h1>
-            <input type="checkbox" checked />
+            <h1 className="font-bold text-lime-600">Public</h1>
+            <img
+              alt="switchOn"
+              src="/assets/toggle-on.svg"
+              className="h-6 w-8 cursor-pointer"
+              onClick={() => handleChangePrivacy()}
+              role="presentation"
+            />
           </div>
         ) : (
           isUserProject &&
-          !isPublic && (
+          !isPublicProject && (
             <div className="flex w-full justify-end items-center gap-3">
-              <h1 className="font-bold">Private</h1>
-              <input type="checkbox" />
+              <h1 className="font-bold text-red-600">Private</h1>
+              <img
+                alt="switchOn"
+                src="/assets/toggle-off.svg"
+                className="h-6 w-8 cursor-pointer"
+                onClick={() => handleChangePrivacy()}
+                role="presentation"
+              />
             </div>
           )
         )}
@@ -163,7 +199,11 @@ function SharedProjectsListing({
             .reverse()
             .join("/")} at ${updatedAt.toString().split("T")[1].split(".")[0]}`}
         </p>
-        <p className="h-[150px]">{description}</p>
+        <p className="h-[150px] text-base font-medium font-barlow max-h-[150px]">
+          {description.length > 400
+            ? `${description.split("").splice(0, 400).join("")}............`
+            : description}
+        </p>
         <div className="flex items-center justify-between mx-8">
           <h1 className="bg-yellow-200 text-black px-2 rounded-sm font-bold">
             Javascript
@@ -194,4 +234,4 @@ function SharedProjectsListing({
   );
 }
 
-export default SharedProjectsListing;
+export default ProjectsListing;

@@ -1,9 +1,10 @@
-import { gql, useLazyQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import { useState } from "react";
 import { Button } from "flowbite-react";
+import { NavLink } from "react-router-dom";
 
 import IUser from "../interfaces/IUser";
-import SharedProjectsListing from "../components/SharedProjectListing";
+import ProjectsListing from "../components/ProjectListing";
 import IProjectsListing from "../interfaces/IProjectsListing";
 import ILike from "../interfaces/ILike";
 
@@ -24,6 +25,12 @@ const GET_USER_PROJECTS = gql`
     getProjectsByUserId(userId: $userId) {
       comments {
         id
+      }
+      likes {
+        user {
+          id
+          pseudo
+        }
       }
       createdAt
       description
@@ -51,6 +58,12 @@ const GET_PROJECTS_SUPPORTED = gql`
       name
       isPublic
       id
+      likes {
+        user {
+          id
+          pseudo
+        }
+      }
       user {
         id
         pseudo
@@ -67,6 +80,30 @@ const GET_USER_LIKES = gql`
   }
 `;
 
+const GET_USER_COMMENTS = gql`
+  query GetAllCommentsByUser($userId: String!) {
+    getAllCommentsByUser(userId: $userId) {
+      id
+    }
+  }
+`;
+
+const MODIFY_USER = gql`
+  mutation ModifyUser(
+    $modifyUserId: String!
+    $email: String
+    $password: String
+    $pseudo: String
+  ) {
+    modifyUser(
+      id: $modifyUserId
+      email: $email
+      password: $password
+      pseudo: $pseudo
+    )
+  }
+`;
+
 function UserSpaceContainer() {
   const [mail, setMail] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -75,6 +112,7 @@ function UserSpaceContainer() {
   const [pseudo, setPseudo] = useState<string>("");
   const [dailyRuns, setDailyRuns] = useState<number>(0);
   const [likes, setLikes] = useState<number>(0);
+  const [comments, setComments] = useState<number>(0);
   const [informationsModification, setInformationsModification] =
     useState<boolean>(false);
   const [userProjects, setUserProjects] = useState<IProjectsListing[]>();
@@ -85,7 +123,7 @@ function UserSpaceContainer() {
   const [supportedProjectsMore, setSupportedProjectsMore] =
     useState<boolean>(false);
 
-  const [getUser] = useLazyQuery(GET_ONE_USER, {
+  useQuery(GET_ONE_USER, {
     variables: { getOneUserId: localStorage.getItem("uuid") },
     onCompleted(data: { getOneUser: IUser }) {
       setName("Jean-Claude");
@@ -96,37 +134,73 @@ function UserSpaceContainer() {
     },
   });
 
-  const [getUserProjects] = useLazyQuery(GET_USER_PROJECTS, {
+  useQuery(GET_USER_PROJECTS, {
     variables: { userId: localStorage.getItem("uuid") },
     onCompleted(data: { getProjectsByUserId: IProjectsListing[] }) {
       setUserProjects(data.getProjectsByUserId);
     },
   });
 
-  const [getSupportedProjects] = useLazyQuery(GET_PROJECTS_SUPPORTED, {
+  useQuery(GET_PROJECTS_SUPPORTED, {
     variables: { userId: localStorage.getItem("uuid") },
     onCompleted(data: { getProjectsSupported: IProjectsListing[] }) {
       setSupportedProject(data.getProjectsSupported);
     },
   });
 
-  const [getUserLikes] = useLazyQuery(GET_USER_LIKES, {
+  useQuery(GET_USER_LIKES, {
     variables: { userId: localStorage.getItem("uuid") },
     onCompleted(data: { getAllLikesByUser: ILike[] }) {
       setLikes(data.getAllLikesByUser.length);
     },
   });
 
+  useQuery(GET_USER_COMMENTS, {
+    variables: { userId: localStorage.getItem("uuid") },
+    onCompleted(data: { getAllCommentsByUser: Comment[] }) {
+      setComments(data.getAllCommentsByUser.length);
+    },
+  });
+
+  const [modifyUser] = useMutation(MODIFY_USER);
+
   const handleClickModify = () => {
+    if (informationsModification) {
+      modifyUser({
+        variables: {
+          modifyUserId: localStorage.getItem("uuid"),
+          email: mail,
+          password,
+          pseudo,
+        },
+      });
+    }
     setInformationsModification(!informationsModification);
   };
 
-  useEffect(() => {
-    getUser();
-    getUserProjects();
-    getSupportedProjects();
-    getUserLikes();
-  }, [getUser, getUserProjects, getSupportedProjects, getUserLikes]);
+  const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
+  };
+
+  const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+
+  const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMail(e.target.value);
+  };
+
+  const handleChangePseudo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPseudo(e.target.value);
+  };
+
+  const graduationColor = [
+    { min: 0, max: 20, color: "from-green-800 via-green-600 to-green-400" },
+    { min: 21, max: 40, color: "from-lime-800 via-lime-600 to-lime-400" },
+    { min: 41, max: 60, color: "from-yellow-800 via-yellow-600 to-yellow-400" },
+    { min: 61, max: 80, color: "from-orange-800 via-orange-600 to-orange-400" },
+    { min: 81, max: 100, color: "from-red-800 via-red-600 to-red-400" },
+  ];
 
   return (
     <div className="flex flex-col h-full gap-16 mx-32 my-10">
@@ -141,10 +215,12 @@ function UserSpaceContainer() {
               <p className="font-barlow text-xl">Name</p>
               {informationsModification ? (
                 <input
-                  className="w-full rounded-sm p-1"
+                  className="w-full rounded-sm p-1 pl-2 font-bold text-black"
                   value={name}
                   autoComplete={name}
-                  onChange={() => {}}
+                  onChange={(e) => {
+                    handleChangeName(e);
+                  }}
                 />
               ) : (
                 <div className="w-full rounded-sm p-1 pl-2 font-bold bg-white text-black">
@@ -156,10 +232,12 @@ function UserSpaceContainer() {
               <p className="font-barlow text-xl">Mail</p>
               {informationsModification ? (
                 <input
-                  className="w-full rounded-sm p-1 "
+                  className="w-full rounded-sm p-1 pl-2 font-bold text-black"
                   type="email"
                   value={mail}
-                  onChange={() => {}}
+                  onChange={(e) => {
+                    handleChangeEmail(e);
+                  }}
                 />
               ) : (
                 <div className="w-full rounded-sm p-1 pl-2 font-bold bg-white text-black">
@@ -173,10 +251,12 @@ function UserSpaceContainer() {
               <p className="font-barlow text-xl">Pseudo</p>
               {informationsModification ? (
                 <input
-                  className="w-full rounded-sm p-1"
+                  className="w-full rounded-sm p-1 pl-2 font-bold text-black"
                   value={pseudo}
                   autoComplete={pseudo}
-                  onChange={() => {}}
+                  onChange={(e) => {
+                    handleChangePseudo(e);
+                  }}
                 />
               ) : (
                 <div className="w-full rounded-sm p-1 pl-2 font-bold bg-white text-black">
@@ -189,10 +269,12 @@ function UserSpaceContainer() {
               {informationsModification ? (
                 <input
                   type="password"
-                  className="w-full rounded-sm p-1"
+                  className="w-full rounded-sm p-1 pl-2 font-bold text-black"
                   value={password}
                   autoComplete={password}
-                  onChange={() => {}}
+                  onChange={(e) => {
+                    handleChangePassword(e);
+                  }}
                 />
               ) : (
                 <div className="w-full rounded-sm p-1 pl-2 font-bold bg-white text-black">
@@ -213,8 +295,8 @@ function UserSpaceContainer() {
       </div>
       <div className="flex flex-col gap-3">
         <h1 className="font-aldrich text-3xl">My projects :</h1>
-        {!userProjectsMore && userProjects ? (
-          <SharedProjectsListing
+        {!userProjectsMore && userProjects && userProjects.length > 0 ? (
+          <ProjectsListing
             id={userProjects[0].id}
             comments={userProjects[0].comments}
             description={userProjects[0].description}
@@ -229,7 +311,7 @@ function UserSpaceContainer() {
         ) : (
           userProjects &&
           userProjects.map((el) => (
-            <SharedProjectsListing
+            <ProjectsListing
               id={el.id}
               comments={el.comments}
               description={el.description}
@@ -244,19 +326,36 @@ function UserSpaceContainer() {
           ))
         )}
         <div className="flex justify-center items-center w-full ">
-          <img
-            role="presentation"
-            src={`/assets/arrow-${!userProjectsMore ? "down" : "up"}.svg`}
-            alt="arrowDown"
-            className="w-14 h-14 p-2 border-2 border-white m-8 rounded-full cursor-pointer"
-            onClick={() => setUserProjectsMore(!userProjectsMore)}
-          />
+          {userProjects && userProjects.length > 0 ? (
+            <img
+              role="presentation"
+              src={`/assets/arrow-${!userProjectsMore ? "down" : "up"}.svg`}
+              alt="arrowDown"
+              className="w-14 h-14 p-2 border-2 border-white m-8 rounded-full cursor-pointer"
+              onClick={() => setUserProjectsMore(!userProjectsMore)}
+            />
+          ) : (
+            <div className="my-32 flex flex-col justify-center items-center gap-4">
+              <p>No project created yet...</p>
+              <NavLink to="/editor">
+                <Button
+                  type="submit"
+                  gradientDuoTone="cyanToBlue"
+                  className="m-auto"
+                >
+                  LET&nbsp;S CODE
+                </Button>
+              </NavLink>
+            </div>
+          )}
         </div>
       </div>
       <div className="flex flex-col gap-3">
         <h1 className="font-aldrich text-3xl">Projects supported :</h1>
-        {!supportedProjectsMore && supportedProjects ? (
-          <SharedProjectsListing
+        {!supportedProjectsMore &&
+        supportedProjects &&
+        supportedProjects.length > 0 ? (
+          <ProjectsListing
             id={supportedProjects[0].id}
             comments={supportedProjects[0].comments}
             description={supportedProjects[0].description}
@@ -270,7 +369,7 @@ function UserSpaceContainer() {
         ) : (
           supportedProjects &&
           supportedProjects.map((el) => (
-            <SharedProjectsListing
+            <ProjectsListing
               id={el.id}
               comments={el.comments}
               description={el.description}
@@ -284,13 +383,30 @@ function UserSpaceContainer() {
           ))
         )}
         <div className="flex justify-center items-center w-full">
-          <img
-            role="presentation"
-            src={`/assets/arrow-${!supportedProjectsMore ? "down" : "up"}.svg`}
-            alt="arrowDown"
-            className="w-14 h-14 p-2 border-2 border-white m-8 rounded-full cursor-pointer"
-            onClick={() => setSupportedProjectsMore(!supportedProjectsMore)}
-          />
+          {supportedProjects && supportedProjects.length > 0 ? (
+            <img
+              role="presentation"
+              src={`/assets/arrow-${
+                !supportedProjectsMore ? "down" : "up"
+              }.svg`}
+              alt="arrowDown"
+              className="w-14 h-14 p-2 border-2 border-white m-8 rounded-full cursor-pointer"
+              onClick={() => setSupportedProjectsMore(!supportedProjectsMore)}
+            />
+          ) : (
+            <div className="my-32 flex flex-col justify-center items-center gap-4">
+              <p>No project supported yet...</p>
+              <NavLink to="/shares">
+                <Button
+                  type="submit"
+                  gradientDuoTone="cyanToBlue"
+                  className="m-auto"
+                >
+                  BEST SHARES
+                </Button>
+              </NavLink>
+            </div>
+          )}
         </div>
       </div>
       <div className="flex flex-col gap-3">
@@ -298,71 +414,124 @@ function UserSpaceContainer() {
         <div className="flex items-center gap-2">
           <p
             className={
-              !isPremium
+              isPremium
                 ? "bg-gradient-to-r bg-clip-text text-transparent from-orange-800 via-orange-500 to-yellow-600 animate-premiumColorChanging text-xl font-bold"
-                : "text-green-600 text-xl font-bold"
+                : "text-lime-700 text-xl font-bold"
             }
           >
-            ● {isPremium ? "Free" : "Premium"} account
+            ● {!isPremium ? "Free" : "Premium"} account
           </p>
         </div>
       </div>
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <p>Number of run today</p>
-          <div className="flex items-center w-full bg-white rounded-sm h-6">
-            <p
-              className="font-bold text-black bg-green-600 flex justify-center"
-              style={{ width: `${((dailyRuns + 1) / 50) * 100}%` }}
-            >
-              {dailyRuns + 1}
-            </p>
-            <p
-              className="font-bold text-black flex justify-center"
-              style={{ width: `${((50 - dailyRuns + 1) / 50) * 100}%` }}
-            >
-              {50 - dailyRuns - 1}
-            </p>
-          </div>
+          <p>Number of runs today</p>
+          {!isPremium ? (
+            <div className="flex items-center w-full bg-white rounded-sm h-6">
+              <p
+                className={`font-bold text-black flex justify-center bg-gradient-to-r animate-premiumColorChanging${
+                  graduationColor[
+                    graduationColor.findIndex(
+                      (el) =>
+                        el.min <= (dailyRuns / 50) * 100 &&
+                        el.max >= (dailyRuns / 50) * 100,
+                    )
+                  ].color
+                }`}
+                style={{ width: `${(dailyRuns / 50) * 100}%` }}
+              >
+                {dailyRuns > 0 && dailyRuns}
+              </p>
+              <p
+                className="font-bold text-black flex justify-center"
+                style={{ width: `${((50 - dailyRuns) / 50) * 100}%` }}
+              >
+                {50 - dailyRuns > 0 && 50 - dailyRuns}
+              </p>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center w-full rounded-sm h-6 font-bold text-black bg-gradient-to-r from-green-800 via-green-600 to-green-400 animate-premiumColorChanging">
+              {dailyRuns} / ∞
+            </div>
+          )}
         </div>
       </div>
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <p>Number of likes this month</p>
-          <div className="flex items-center justify-center w-full bg-white rounded-sm h-6">
-            <p
-              className="font-bold text-black bg-red-500 flex justify-center"
-              style={{ width: `${((likes + 1) / 5) * 100}%` }}
-            >
-              {likes}
-            </p>
-            <p
-              className="font-bold text-black flex justify-center"
-              style={{ width: `${((5 - likes + 1) / 5) * 100}%` }}
-            >
-              5
-            </p>
-          </div>
+          {!isPremium ? (
+            <div className="flex items-center justify-center w-full bg-white rounded-sm h-6">
+              <p
+                className={`font-bold text-black flex justify-center bg-gradient-to-r animate-premiumColorChanging ${
+                  graduationColor[
+                    graduationColor.findIndex(
+                      (el) =>
+                        el.min <= (likes / 5) * 100 &&
+                        el.max >= (likes / 5) * 100,
+                    )
+                  ].color
+                }`}
+                style={{ width: `${(likes / 5) * 100}%` }}
+              >
+                {likes > 0 && likes}
+              </p>
+              <p
+                className="font-bold text-black flex justify-center"
+                style={{ width: `${((5 - likes) / 5) * 100}%` }}
+              >
+                {5 - likes > 0 && 5 - likes}
+              </p>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center w-full rounded-sm h-6 font-bold text-black bg-gradient-to-r from-green-800 via-green-600 to-green-400 animate-premiumColorChanging">
+              {likes} / ∞
+            </div>
+          )}
         </div>
       </div>
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <p>Number commentaries this month</p>
-          <div className="flex items-center justify-center w-full bg-white rounded-sm h-6">
-            <p
-              className="font-bold text-black bg-red-500 flex justify-center"
-              style={{ width: `${((likes + 1) / 5) * 100}%` }}
-            >
-              {likes}
-            </p>
-            <p
-              className="font-bold text-black flex justify-center"
-              style={{ width: `${((5 - likes + 1) / 5) * 100}%` }}
-            >
-              5
-            </p>
-          </div>
+          {!isPremium ? (
+            <div className="flex items-center justify-center w-full bg-white rounded-sm h-6">
+              <p
+                className={`font-bold text-black flex justify-center bg-gradient-to-r animate-premiumColorChanging ${
+                  graduationColor[
+                    graduationColor.findIndex(
+                      (el) =>
+                        el.min <= (comments / 5) * 100 &&
+                        el.max >= (comments / 5) * 100,
+                    )
+                  ].color
+                }`}
+                style={{ width: `${(comments / 5) * 100}%` }}
+              >
+                {comments > 0 && comments}
+              </p>
+              <p
+                className="font-bold text-black flex justify-center"
+                style={{ width: `${((5 - comments) / 5) * 100}%` }}
+              >
+                {5 - comments > 0 && 5 - comments}
+              </p>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center w-full rounded-sm h-6 font-bold text-black bg-gradient-to-r from-green-800 via-green-600 to-green-400 animate-premiumColorChanging">
+              {comments} / ∞
+            </div>
+          )}
         </div>
+        {!isPremium && (
+          <NavLink className="mx-auto mt-14 w-1/5" to="/premium">
+            <Button
+              type="submit"
+              gradientDuoTone="pinkToOrange"
+              className="m-auto"
+            >
+              GET YOUR PREMIUM ACCESS NOW
+            </Button>
+          </NavLink>
+        )}
       </div>
     </div>
   );
