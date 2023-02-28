@@ -26,7 +26,7 @@ function UserNavbar({ opened, setOpened }: INavbarProps) {
             onKeyDown={() => setOpened(!opened)}
           >
             <img className="w-8 h-8" src="assets/user.svg" alt="user" />
-            <ul className="absolute flex flex-col justify-center items-center border-b-2 border-l-2 border-white bg-black/30 h-fit w-52 top-20 right-0 ">
+            <ul className="absolute flex flex-col justify-center items-center border-b-2 border-l-2 border-t-2 border-white bg-[#11172a] h-fit w-52 top-20 right-0 z-30">
               <NavLink
                 to="/login"
                 className="p-4 border-b-2 border-white w-full text-center hover:bg-black/40"
@@ -37,7 +37,7 @@ function UserNavbar({ opened, setOpened }: INavbarProps) {
                   <span>
                     <img
                       className="w-6 h-6 mr-2.5"
-                      src="assets/login.svg"
+                      src="/assets/login.svg"
                       alt="login"
                     />
                   </span>
@@ -54,7 +54,7 @@ function UserNavbar({ opened, setOpened }: INavbarProps) {
                   <span>
                     <img
                       className="w-6 h-6"
-                      src="assets/register.svg"
+                      src="/assets/register.svg"
                       alt="register"
                     />
                   </span>
@@ -71,8 +71,8 @@ function UserNavbar({ opened, setOpened }: INavbarProps) {
             onClick={() => setOpened(!opened)}
             onKeyDown={() => setOpened(!opened)}
           >
-            <img className="w-8 h-8" src="assets/user.svg" alt="user" />
-            <ul className="absolute flex flex-col justify-center items-center border-b-2 border-l-2 border-white bg-black/30 h-fit w-52 top-20 right-0">
+            <img className="w-8 h-8" src="/assets/user.svg" alt="user" />
+            <ul className="absolute flex flex-col justify-center items-center border-b-2 border-l-2 border-t-2 border-white bg-[#11172a] h-fit w-52 top-20 right-0 z-30">
               <NavLink
                 to="/user-space"
                 className="p-4 border-b-2 border-white w-full text-center hover:bg-black/40"
@@ -102,7 +102,7 @@ function UserNavbar({ opened, setOpened }: INavbarProps) {
                   <span>
                     <img
                       className="w-6 h-6"
-                      src="assets/logout.svg"
+                      src="/assets/logout.svg"
                       alt="logout"
                     />
                   </span>
@@ -120,7 +120,7 @@ function UserNavbar({ opened, setOpened }: INavbarProps) {
           onClick={() => setOpened(!opened)}
           onKeyDown={() => setOpened(!opened)}
         >
-          <img className="w-8 h-8" src="assets/user.svg" alt="user" />
+          <img className="w-8 h-8" src="/assets/user.svg" alt="user" />
         </div>
       )}
     </div>

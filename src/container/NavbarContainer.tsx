@@ -10,20 +10,20 @@ function NavbarContainer() {
       <NavLink to="/" className="cursor-default">
         <img
           className="w-30 h-20 tablet:w-20 tablet:h-14 hover:cursor-pointer"
-          src="assets/logo.png"
+          src="/assets/logo.png"
           alt="logo"
         />
       </NavLink>
       <ul className="flex flex-row justify-between font-aldrich text-white text-lg tablet:text-sm  items-center color:white">
         <NavLink
-          to="/editor"
+          to="/choose"
           className={(navData) => (navData.isActive ? "bg-black/40" : "")}
           onClick={() => setOpened(false)}
         >
           <li className="border-r-2 border-white p-6">Code Editor</li>
         </NavLink>
         <NavLink
-          to="/projects"
+          to="/shares"
           className={(navData) => (navData.isActive ? "bg-black/40" : "")}
           onClick={() => setOpened(false)}
         >

@@ -5,17 +5,23 @@ import { Button } from "flowbite-react";
 
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { gql, useLazyQuery } from "@apollo/client";
+import ILoginFormValues from "../interfaces/ILoginFormValues";
+import ITokenWithUserValues from "../interfaces/ITokenWithUser";
 
-const GET_TOKEN = gql`
+const GET_TOKEN_WITH_USER = gql`
   query Query($password: String!, $email: String!) {
-    getToken(password: $password, email: $email)
+    getTokenWithUser(password: $password, email: $email) {
+      user {
+        dailyRuns
+        email
+        id
+        premium
+        pseudo
+      }
+      token
+    }
   }
 `;
-
-interface ILoginFormValues {
-  email: string;
-  password: string;
-}
 
 /* --------------------FORM VALIDATION-------------------- */
 const schema = yup
@@ -33,9 +39,10 @@ const schema = yup
 
 function LoginContainer() {
   const navigate = useNavigate();
-  const [login, { error }] = useLazyQuery(GET_TOKEN, {
-    onCompleted(data: { getToken: string }) {
-      localStorage.setItem("token", data.getToken);
+  const [login, { error }] = useLazyQuery(GET_TOKEN_WITH_USER, {
+    onCompleted(data: { getTokenWithUser: ITokenWithUserValues }) {
+      localStorage.setItem("token", data.getTokenWithUser.token);
+      localStorage.setItem("uuid", data.getTokenWithUser.user.id);
       navigate("/");
     },
   });
