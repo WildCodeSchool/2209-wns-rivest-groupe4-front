@@ -36,7 +36,7 @@ const CREATE_PROJECT = gql`
       userId: $userId
       description: $description
       name: $name
-      public: $public
+      isPublic: $public
     ) {
       id
     }
@@ -50,7 +50,7 @@ const GET_CHOSEN_PROJECT = gql`
       description
       createdAt
       name
-      public
+      isPublic
       updatedAt
     }
     getAllFoldersByProjectId(idProject: $id) {
@@ -170,16 +170,19 @@ function EditorContainer({ action, existingProjects }: Props) {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSave = () => {
     if (currentFile) {
       saveFile();
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleShare = () => {
     // TODO create hashed link userID and projectID
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDownload = () => {
     // TODO download zip with project structure
   };

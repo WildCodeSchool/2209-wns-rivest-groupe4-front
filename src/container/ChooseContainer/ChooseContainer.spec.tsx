@@ -1,8 +1,10 @@
 import React from "react";
-import ChooseContainer from './ChooseContainer';
+import { render } from "@testing-library/react";
+
+import ChooseContainer from "./ChooseContainer";
 
 describe("ChooseContainer component", () => {
   it("Shows relevant information", () => {
-    const { getByText } = render(<ChooseContainer />)
+    render(<ChooseContainer />);
   });
 });

@@ -5,10 +5,16 @@ import { Button } from "flowbite-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
 import { gql, useMutation } from "@apollo/client";
+import ITokenWithUserValues from "../interfaces/ITokenWithUser";
 
 const CREATE_USER = gql`
   mutation Mutation($pseudo: String!, $password: String!, $email: String!) {
-    createUser(pseudo: $pseudo, password: $password, email: $email)
+    createUser(pseudo: $pseudo, password: $password, email: $email) {
+      token
+      user {
+        id
+      }
+    }
   }
 `;
 
@@ -46,8 +52,9 @@ const schema = yup
 function RegisterContainer() {
   const navigate = useNavigate();
   const [signUp, { error }] = useMutation(CREATE_USER, {
-    onCompleted(data: { createUser: string }) {
-      localStorage.setItem("token", data.createUser);
+    onCompleted(data: { createUser: ITokenWithUserValues }) {
+      localStorage.setItem("token", data.createUser.token);
+      localStorage.setItem("uuid", data.createUser.user.id);
       navigate("/");
     },
   });
