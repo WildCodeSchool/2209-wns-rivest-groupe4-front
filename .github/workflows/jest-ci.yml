@@ -22,10 +22,10 @@ jobs:
 
       - name: Test
         run: npm run testCI
-        
+
   docker:
     needs: test-front
-    if: github.ref == 'refs/heads/main'
+    # if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
