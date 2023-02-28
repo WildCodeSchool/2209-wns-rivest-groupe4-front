@@ -45,4 +45,4 @@ jobs:
         with:
           push: true
           context: "{{defaultContext}}"
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/codeless4-front
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/codeless4-front:latest
