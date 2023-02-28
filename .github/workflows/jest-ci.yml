@@ -46,4 +46,6 @@ jobs:
         with:
           push: true
           context: "{{defaultContext}}"
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/codeless4-front:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/codeless4-front:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/codeless4-front:${{ github.sha }}
