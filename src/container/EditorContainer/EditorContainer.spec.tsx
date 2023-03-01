@@ -1,28 +1,21 @@
 import { render, screen } from "@testing-library/react";
-import { MockedProvider } from "@apollo/client/testing";
+import { MockedProvider, MockedResponse } from "@apollo/client/testing";
 
-import EditorContainer from "./EditorContainer";
+import EditorContainer, { GET_CHOSEN_PROJECT } from "./EditorContainer";
 
-const MOCK_PROJECTS = [
-  {
-    id: 1,
-    name: "Project 1",
-  },
-  {
-    id: 2,
-    name: "Project 2",
-  },
+const mocks: Array<MockedResponse> = [
+  { request: { query: GET_CHOSEN_PROJECT }, result: { data: {} } },
 ];
 
 describe("InputEditor component", () => {
-  it("Shows relevant elements by default", () => {
+  it("Shows relevant elements by default", async () => {
     render(
-      <MockedProvider>
-        <EditorContainer action={null} existingProjects={MOCK_PROJECTS} />
+      <MockedProvider mocks={mocks}>
+        <EditorContainer />
       </MockedProvider>,
     );
 
-    expect(screen.getByText("Codeless 4 Editor")).toBeDefined();
+    expect(await screen.findByText("Codeless 4 Editor")).toBeDefined();
     expect(screen.getByRole("button", { name: "Run" })).toBeDefined();
     expect(screen.getByAltText("save file")).toBeDefined();
     expect(screen.getByAltText("download file")).toBeDefined();
