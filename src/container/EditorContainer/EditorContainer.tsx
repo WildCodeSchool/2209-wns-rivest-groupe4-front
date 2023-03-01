@@ -328,10 +328,7 @@ function EditorContainer({ action, existingProjects }: Props) {
               className="px-2 py-2 bg-[#20252D] absolute"
               onClick={() => handleRun()}
             >
-              <img
-                src={isOpen ? arrowRight : arrowLeft}
-                alt="arrow pointing in closing direction"
-              />
+              <img src={isOpen ? arrowRight : arrowLeft} alt="arrow pointing" />
             </button>
           </div>
           {isOpen && (

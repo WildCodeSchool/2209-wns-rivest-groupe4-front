@@ -144,6 +144,7 @@ function EditorAside({ projectData, setCurrentFile }: Props) {
   return (
     <aside
       className="w-[15%] bg-[#20252D] py-2"
+      data-testid="editor-aside"
       style={{
         borderRightWidth: 2,
         borderColor: "white",
