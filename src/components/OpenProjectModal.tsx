@@ -1,7 +1,8 @@
 import { gql, useQuery } from "@apollo/client";
 import { Button, ListGroup, Modal, Spinner } from "flowbite-react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
 
 const GET_PROJECTS = gql`
   query GetProjectsByUserId($userId: String!) {
@@ -12,18 +13,14 @@ const GET_PROJECTS = gql`
   }
 `;
 
-type Props = {
-  userId: string | null | undefined;
-  // TODO update with user context
-};
-
-export default function OpenProjectModal({ userId }: Props) {
+export default function OpenProjectModal() {
+  const { user } = useContext(UserContext);
   const [showOpenProjectModal, setShowOpenProjectModal] = useState(false);
 
   const navigate = useNavigate();
 
   const { loading, error, data } = useQuery(GET_PROJECTS, {
-    variables: { userId },
+    variables: { userId: user?.id },
   });
 
   // TODO gèrer les erreurs

@@ -1,6 +1,6 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Button, Spinner } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useParams } from "react-router-dom";
 import arrowLeft from "../../../public/assets/arrowLeft.svg";
@@ -58,8 +58,6 @@ const SAVE_PROJECT = gql`
 `;
 
 function EditorContainer() {
-  const [userID, setUserID] = useState<string | null>(null);
-
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const { idProject } = useParams();
@@ -114,14 +112,6 @@ function EditorContainer() {
     setIsOpen(!isOpen);
     saveFile();
   };
-
-  useEffect(() => {
-    if (localStorage.getItem("uuid")) {
-      setUserID(localStorage.getItem("uuid"));
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userID]);
 
   if (loading) return <Spinner />;
 
