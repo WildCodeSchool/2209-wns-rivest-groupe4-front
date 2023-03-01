@@ -24,7 +24,7 @@ function App() {
         <Route path="/" element={<HomeScreen />} />
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/register" element={<RegisterScreen />} />
-        <Route path="/editor" element={<EditorScreen />} />
+        <Route path="/editor/:idProject" element={<EditorScreen />} />
 
         <Route
           path="/project-details/:idProject"
