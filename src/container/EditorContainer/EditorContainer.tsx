@@ -14,7 +14,7 @@ import ReturnEditor from "../../components/ReturnEditor";
 import IFile from "../../interfaces/IFile";
 import { ExistingProjectQueryResult } from "./types";
 
-const GET_CHOSEN_PROJECT = gql`
+export const GET_CHOSEN_PROJECT = gql`
   query GetOneProject($id: Float!) {
     getOneProject(id: $id) {
       id
