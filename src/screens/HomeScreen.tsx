@@ -3,7 +3,7 @@ import { Button } from "flowbite-react";
 import HomeDescriptionCard from "../components/HomeDescriptionCard";
 import HomeAccountDescriptionCard from "../components/HomeAccountDescriptionCard";
 
-const descrideCardsData = [
+const describeCardsData = [
   {
     title: "CODELESS 4 Code Editor",
     text: "The Codeless 4 Editor is an innovative online code editor that offers a smooth and intuitive development experience. With its user-friendly interface, you can quickly create complex projects and compile them in just a few seconds. This tool offers great flexibility and allows you to work on your projects from anywhere, anytime. The support for many programming languages and advanced features such as auto-correction and syntax highlighting make the Codeless 4 Editor a perfect choice for both novice and experienced developers. If you're looking to improve your productivity and simplify your development process, the Codeless 4 Editor is the ideal solution for you.",
@@ -28,7 +28,7 @@ function HomeScreen() {
         />
       </div>
 
-      {descrideCardsData.map((data, index) => {
+      {describeCardsData.map((data, index) => {
         return (
           <HomeDescriptionCard
             key={`${Math.random()}`}
