@@ -1,5 +1,5 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Button } from "flowbite-react";
 import { NavLink } from "react-router-dom";
 
@@ -7,6 +7,7 @@ import IUser from "../interfaces/IUser";
 import ProjectsListing from "../components/ProjectListing";
 import IProjectsListing from "../interfaces/IProjectsListing";
 import ILike from "../interfaces/ILike";
+import { UserContext } from "../contexts/UserContext";
 
 const GET_ONE_USER = gql`
   query Query($getOneUserId: String!) {
@@ -105,6 +106,7 @@ const MODIFY_USER = gql`
 `;
 
 function UserSpaceContainer() {
+  const { user } = useContext(UserContext);
   const [mail, setMail] = useState<string>("");
   const [name, setName] = useState<string>("");
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -124,7 +126,7 @@ function UserSpaceContainer() {
     useState<boolean>(false);
 
   useQuery(GET_ONE_USER, {
-    variables: { getOneUserId: localStorage.getItem("uuid") },
+    variables: { getOneUserId: user?.id },
     onCompleted(data: { getOneUser: IUser }) {
       setName("Jean-Claude");
       setMail(data.getOneUser.email);
@@ -135,28 +137,28 @@ function UserSpaceContainer() {
   });
 
   useQuery(GET_USER_PROJECTS, {
-    variables: { userId: localStorage.getItem("uuid") },
+    variables: { userId: user?.id },
     onCompleted(data: { getProjectsByUserId: IProjectsListing[] }) {
       setUserProjects(data.getProjectsByUserId);
     },
   });
 
   useQuery(GET_PROJECTS_SUPPORTED, {
-    variables: { userId: localStorage.getItem("uuid") },
+    variables: { userId: user?.id },
     onCompleted(data: { getProjectsSupported: IProjectsListing[] }) {
       setSupportedProject(data.getProjectsSupported);
     },
   });
 
   useQuery(GET_USER_LIKES, {
-    variables: { userId: localStorage.getItem("uuid") },
+    variables: { userId: user?.id },
     onCompleted(data: { getAllLikesByUser: ILike[] }) {
       setLikes(data.getAllLikesByUser.length);
     },
   });
 
   useQuery(GET_USER_COMMENTS, {
-    variables: { userId: localStorage.getItem("uuid") },
+    variables: { userId: user?.id },
     onCompleted(data: { getAllCommentsByUser: Comment[] }) {
       setComments(data.getAllCommentsByUser.length);
     },
@@ -168,7 +170,7 @@ function UserSpaceContainer() {
     if (informationsModification) {
       modifyUser({
         variables: {
-          modifyUserId: localStorage.getItem("uuid"),
+          modifyUserId: user?.id,
           email: mail,
           password,
           pseudo,

@@ -7,8 +7,9 @@ import {
   Spinner,
   TextInput,
 } from "flowbite-react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
 
 const CREATE_PROJECT = gql`
   mutation CreateProject(
@@ -28,12 +29,8 @@ const CREATE_PROJECT = gql`
   }
 `;
 
-type Props = {
-  userId: string | null | undefined;
-  // TODO update with user context
-};
-
-export default function CreateProjectModal({ userId }: Props) {
+export default function CreateProjectModal() {
+  const { user } = useContext(UserContext);
   const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
   const [newProjectData, setNewProjectData] = useState({
     name: "",
@@ -54,7 +51,7 @@ export default function CreateProjectModal({ userId }: Props) {
     createProject({
       variables: {
         ...newProjectData,
-        userId,
+        userId: user?.id,
       },
     });
   };
