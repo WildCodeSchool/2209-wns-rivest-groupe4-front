@@ -8,6 +8,8 @@ type FormValues = {
 };
 
 function ContactScreen() {
+  document.title = "Codeless4 | Contact";
+
   const {
     register,
     handleSubmit,

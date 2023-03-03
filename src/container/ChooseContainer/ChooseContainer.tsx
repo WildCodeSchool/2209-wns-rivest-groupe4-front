@@ -6,6 +6,8 @@ import OpenProjectModal from "../../components/OpenProjectModal";
 import { UserContext } from "../../contexts/UserContext";
 
 export default function ChooseContainer() {
+  document.title = "Codeless4 | Project";
+
   const { user } = useContext(UserContext);
 
   const navigate = useNavigate();

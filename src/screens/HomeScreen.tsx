@@ -17,6 +17,7 @@ const describeCardsData = [
 ];
 
 function HomeScreen() {
+  document.title = "Codeless4 | Home";
   return (
     <section className="flex flex-col h-fit gap-32 mx-32 my-16 desktopSmall:gap-6">
       <div className="flex flex-col gap-4 w-full justify-center items-center">

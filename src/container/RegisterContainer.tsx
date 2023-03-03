@@ -50,6 +50,8 @@ const schema = yup
   .required();
 
 function RegisterContainer() {
+  document.title = "Codeless4 | Register";
+
   const navigate = useNavigate();
   const [signUp, { error }] = useMutation(CREATE_USER, {
     onCompleted(data: { createUser: ITokenWithUserValues }) {
