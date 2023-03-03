@@ -24,6 +24,7 @@ export default function OpenProjectModal() {
   });
 
   // TODO gèrer les erreurs
+  if (error) navigate("/home");
 
   return (
     <>
