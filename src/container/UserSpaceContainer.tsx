@@ -106,6 +106,8 @@ const MODIFY_USER = gql`
 `;
 
 function UserSpaceContainer() {
+  document.title = "Codeless4 | My Account";
+
   const { user } = useContext(UserContext);
   const [mail, setMail] = useState<string>("");
   const [name, setName] = useState<string>("");

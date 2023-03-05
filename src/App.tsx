@@ -65,6 +65,7 @@ const reducer = (prevState: ReducerState, action: ReducerAction) => {
 };
 
 function App() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [authState, dispatch] = useReducer(reducer, initialState);
   const [user, setUser] = useState<User | null>(null);
 

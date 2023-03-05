@@ -113,6 +113,8 @@ const DELETE_LIKE = gql`
 `;
 
 function ProjectDetailsContainer() {
+  document.title = "Codeless4 | Details";
+
   const { idProject } = useParams<string>();
   const [projectDetails, setProjectDetails] = useState<IProjectsListing>();
   const [mainFolder, setMainFolder] = useState<IFolder>();

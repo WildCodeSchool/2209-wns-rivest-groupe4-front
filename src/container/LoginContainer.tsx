@@ -39,6 +39,8 @@ const schema = yup
   .required();
 
 function LoginContainer() {
+  document.title = "Codeless4 | Login";
+
   const navigate = useNavigate();
 
   const { signIn } = useContext(AuthContext);
