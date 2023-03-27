@@ -1,13 +1,15 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { Button, Spinner } from "flowbite-react";
+import { Breadcrumb, Button, Spinner } from "flowbite-react";
 import { useState } from "react";
 
 import { useParams } from "react-router-dom";
-import arrowLeft from "../../../public/assets/arrowLeft.svg";
-import arrowRight from "../../../public/assets/arrowRight.svg";
-import downloadFile from "../../../public/assets/downloadFile.svg";
-import saveFileImg from "../../../public/assets/saveFile.svg";
-import shareFile from "../../../public/assets/shareFile.svg";
+import {
+  ArrowDownOnSquareIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  BookmarkIcon,
+  ShareIcon,
+} from "@heroicons/react/24/outline";
 import EditorAside from "../../components/EditorAside/EditorAside";
 import InputEditor from "../../components/InputEditor/InputEditor";
 import ReturnEditor from "../../components/ReturnEditor";
@@ -123,15 +125,20 @@ function EditorContainer() {
           projectData={currentProject}
         />
       )}
-      <div className="px-8 py-8 h-full w-full flex flex-col">
-        <div className="flex justify-between py-4">
-          <p>
-            {currentProject?.getOneProject.name
-              ? currentProject?.getOneProject.name
-              : "Project"}
-            &nbsp; &gt;{" "}
-            {currentFile ? `${currentFile.name}.${currentFile.extension}` : ""}
-          </p>
+      <div className="h-full w-full flex flex-col">
+        <div className="flex items-center justify-between bg-[#1b1b1b] px-4">
+          <Breadcrumb aria-label="file-breadcrumb" className="py-3">
+            <Breadcrumb.Item>
+              {currentProject?.getOneProject.name
+                ? currentProject?.getOneProject.name
+                : "Project"}
+            </Breadcrumb.Item>
+            <Breadcrumb.Item>
+              {currentFile
+                ? `${currentFile.name}.${currentFile.extension}`
+                : ""}
+            </Breadcrumb.Item>
+          </Breadcrumb>
           <Button
             onClick={() => {
               handleRun();
@@ -144,13 +151,17 @@ function EditorContainer() {
           <div className="flex gap-4">
             {/* TODO add actions */}
             <button type="button" onClick={() => handleSave()}>
-              <img src={saveFileImg} alt="save file" />
+              <BookmarkIcon className="h-6 w-6" />
             </button>
-            <img src={downloadFile} alt="download file" />
-            <img src={shareFile} alt="share file" />
+            <button type="button" onClick={() => handleSave()}>
+              <ArrowDownOnSquareIcon className="h-6 w-6" />
+            </button>
+            <button type="button" onClick={() => handleSave()}>
+              <ShareIcon className="h-6 w-6" />
+            </button>
           </div>
         </div>
-        <div className="flex flex-row gap-8 h-full w-full">
+        <div className="flex flex-row h-full w-full">
           <div className="h-full w-full relative">
             <InputEditor
               editorValue={currentFile ? currentFile.content : ""}
@@ -168,14 +179,18 @@ function EditorContainer() {
             <button
               type="button"
               style={{
-                top: 0,
-                right: 0,
+                top: 1,
+                right: 1,
                 zIndex: 2,
               }}
-              className="px-2 py-2 bg-[#20252D] absolute"
+              className="px-2 py-2 bg-[#1b1b1b] absolute"
               onClick={() => handleRun()}
             >
-              <img src={isOpen ? arrowRight : arrowLeft} alt="arrow pointing" />
+              {isOpen ? (
+                <ArrowRightIcon className="h-6 w-6" />
+              ) : (
+                <ArrowLeftIcon className="h-6 w-6" />
+              )}
             </button>
           </div>
           {isOpen && (

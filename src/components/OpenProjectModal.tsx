@@ -23,7 +23,7 @@ export default function OpenProjectModal() {
     variables: { userId: user?.id },
   });
 
-  // TODO gèrer les erreurs
+  // TODO gérer les erreurs
 
   return (
     <>

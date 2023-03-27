@@ -10,6 +10,12 @@ module.exports = {
   ],
   theme: {
     extend: {
+      color : {
+        ...defaultTheme,
+        primary : {
+          500 : '#1D3148'
+        }
+      },
       animation: {
         premiumColorChanging: "premiumColorChanging 3s ease infinite",
         shaking: "shake 4s ease-in-out infinite",
