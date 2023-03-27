@@ -60,6 +60,8 @@ const SAVE_PROJECT = gql`
 `;
 
 function EditorContainer() {
+  document.title = "Codeless4 | Editor";
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const { idProject } = useParams();

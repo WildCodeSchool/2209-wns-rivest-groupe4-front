@@ -46,6 +46,7 @@ export default function CreateProjectModal() {
     },
   });
   // TODO Gérer les erreurs
+  if (error) navigate("/home");
 
   const handleCreateNewProject = () => {
     createProject({

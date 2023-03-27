@@ -31,6 +31,8 @@ const GET_SHARED_PROJECTS = gql`
 `;
 
 function SharesContainer() {
+  document.title = "Codeless4 | Best Shares";
+
   const [projectsShared, setProjectsShared] = useState<IProjectsListing[]>([]);
   const [projectsSharedFiltered, setProjectsSharedFiltered] = useState<
     IProjectsListing[]

@@ -36,6 +36,8 @@ const GET_USER_COMMENTS = gql`
 `;
 
 function UserSpaceContainer() {
+  document.title = "Codeless4 | My Account";
+
   const { user } = useContext(UserContext);
 
   const [dailyRuns, setDailyRuns] = useState<number>(0);
