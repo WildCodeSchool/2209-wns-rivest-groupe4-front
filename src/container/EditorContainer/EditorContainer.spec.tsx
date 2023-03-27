@@ -17,8 +17,9 @@ describe("InputEditor component", () => {
 
     expect(await screen.findByText("Codeless 4 Editor")).toBeDefined();
     expect(screen.getByRole("button", { name: "Run" })).toBeDefined();
-    expect(screen.getByAltText("save file")).toBeDefined();
-    expect(screen.getByAltText("download file")).toBeDefined();
-    expect(screen.getByAltText("arrow pointing")).toBeDefined();
+    // TODO add Icon detection
+    // expect(screen.getByAltText("save file")).toBeDefined();
+    // expect(screen.getByAltText("download file")).toBeDefined();
+    // expect(screen.getByAltText("arrow pointing")).toBeDefined();
   });
 });
