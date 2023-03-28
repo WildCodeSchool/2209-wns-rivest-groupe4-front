@@ -44,6 +44,7 @@ function UserSpaceMyInformationsContainer() {
   useQuery(GET_ONE_USER, {
     variables: { getOneUserId: user?.id },
     onCompleted(data: { getOneUser: IUser }) {
+      console.warn(data);
       // TODO refresh user context and local storage
       // TODO confirm update with success toast
     },
@@ -78,20 +79,20 @@ function UserSpaceMyInformationsContainer() {
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Pseudo
+                      <input
+                        type="text"
+                        name="pseudo"
+                        value={userUpdates?.pseudo}
+                        onChange={(e) => {
+                          setUserUpdates({
+                            ...userUpdates,
+                            pseudo: e.target.value,
+                          });
+                        }}
+                        id="pseudo"
+                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
+                      />
                     </label>
-                    <input
-                      type="text"
-                      name="pseudo"
-                      value={userUpdates?.pseudo}
-                      onChange={(e) => {
-                        setUserUpdates({
-                          ...userUpdates,
-                          pseudo: e.target.value,
-                        });
-                      }}
-                      id="pseudo"
-                      className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
-                    />
                   </div>
 
                   <div className="col-span-6 sm:col-span-3">
@@ -100,20 +101,20 @@ function UserSpaceMyInformationsContainer() {
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Password
+                      <input
+                        type="password"
+                        name="password"
+                        placeholder="********"
+                        onChange={(e) => {
+                          setUserUpdates({
+                            ...userUpdates,
+                            password: e.target.value,
+                          });
+                        }}
+                        id="password"
+                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
+                      />
                     </label>
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder="********"
-                      onChange={(e) => {
-                        setUserUpdates({
-                          ...userUpdates,
-                          password: e.target.value,
-                        });
-                      }}
-                      id="password"
-                      className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
-                    />
                   </div>
 
                   <div className="col-span-6 sm:col-span-4">
@@ -122,21 +123,21 @@ function UserSpaceMyInformationsContainer() {
                       className="block text-sm font-medium leading-6 text-gray-900"
                     >
                       Email address
+                      <input
+                        type="email"
+                        value={userUpdates?.email}
+                        onChange={(e) => {
+                          setUserUpdates({
+                            ...userUpdates,
+                            email: e.target.value,
+                          });
+                        }}
+                        name="email-address"
+                        id="email-address"
+                        autoComplete="email"
+                        className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
+                      />
                     </label>
-                    <input
-                      type="email"
-                      value={userUpdates?.email}
-                      onChange={(e) => {
-                        setUserUpdates({
-                          ...userUpdates,
-                          email: e.target.value,
-                        });
-                      }}
-                      name="email-address"
-                      id="email-address"
-                      autoComplete="email"
-                      className="mt-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary-500 sm:text-sm sm:leading-6"
-                    />
                   </div>
                 </div>
               </div>

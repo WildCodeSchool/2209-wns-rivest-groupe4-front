@@ -47,9 +47,9 @@ function UserSpaceProjectSupportedContainer() {
   return (
     <div className="flex flex-col gap-3">
       <h1 className="font-aldrich text-3xl">Projects supported :</h1>
-      {supportedProjects?.length > 0 ? (
+      {supportedProjects && supportedProjects?.length > 0 ? (
         supportedProjects.map((el) => (
-          <p>el</p>
+          <p key="key">{el.id}</p>
           // <ProjectsListing
           //   id={el.id}
           //   comments={el.comments}

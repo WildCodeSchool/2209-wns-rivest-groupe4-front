@@ -20,16 +20,16 @@ const GET_ONE_USER = gql`
 `;
 
 const GET_USER_LIKES = gql`
-  query Query($userId: String!) {
-    getAllLikesByUser(userId: $userId) {
+  query Query {
+    getAllLikesByUser {
       id
     }
   }
 `;
 
 const GET_USER_COMMENTS = gql`
-  query GetAllCommentsByUser($userId: String!) {
-    getAllCommentsByUser(userId: $userId) {
+  query GetAllCommentsByUser {
+    getAllCommentsByUser {
       id
     }
   }
@@ -37,7 +37,6 @@ const GET_USER_COMMENTS = gql`
 
 function UserSpaceContainer() {
   document.title = "Codeless4 | My Account";
-
   const { user } = useContext(UserContext);
 
   const [dailyRuns, setDailyRuns] = useState<number>(0);
@@ -55,14 +54,12 @@ function UserSpaceContainer() {
   });
 
   useQuery(GET_USER_LIKES, {
-    variables: { userId: user?.id },
     onCompleted(data: { getAllLikesByUser: ILike[] }) {
       setLikes(data.getAllLikesByUser.length);
     },
   });
 
   useQuery(GET_USER_COMMENTS, {
-    variables: { userId: user?.id },
     onCompleted(data: { getAllCommentsByUser: Comment[] }) {
       setComments(data.getAllCommentsByUser.length);
     },

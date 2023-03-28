@@ -1,10 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Button } from "flowbite-react";
 import { gql, useQuery } from "@apollo/client";
 import IUser from "../interfaces/IUser";
 import ILike from "../interfaces/ILike";
-import { UserContext } from "../contexts/UserContext";
 
 const GET_ONE_USER = gql`
   query Query($getOneUserId: String!) {
@@ -19,16 +18,16 @@ const GET_ONE_USER = gql`
 `;
 
 const GET_USER_LIKES = gql`
-  query Query($userId: String!) {
-    getAllLikesByUser(userId: $userId) {
+  query Query {
+    getAllLikesByUser {
       id
     }
   }
 `;
 
 const GET_USER_COMMENTS = gql`
-  query GetAllCommentsByUser($userId: String!) {
-    getAllCommentsByUser(userId: $userId) {
+  query GetAllCommentsByUser {
+    getAllCommentsByUser {
       id
     }
   }
@@ -43,15 +42,12 @@ const graduationColor = [
 ];
 
 function UserSpaceMyAccountAccessContainer() {
-  const { user } = useContext(UserContext);
-
   const [dailyRuns, setDailyRuns] = useState<number>(0);
   const [likes, setLikes] = useState<number>(0);
   const [comments, setComments] = useState<number>(0);
 
   const [isPremium, setIsPremium] = useState<boolean>(false);
   useQuery(GET_ONE_USER, {
-    variables: { getOneUserId: user?.id },
     onCompleted(data: { getOneUser: IUser }) {
       setIsPremium(data.getOneUser.premium);
       setDailyRuns(data.getOneUser.dailyRuns);
@@ -59,14 +55,12 @@ function UserSpaceMyAccountAccessContainer() {
   });
 
   useQuery(GET_USER_LIKES, {
-    variables: { userId: user?.id },
     onCompleted(data: { getAllLikesByUser: ILike[] }) {
       setLikes(data.getAllLikesByUser.length);
     },
   });
 
   useQuery(GET_USER_COMMENTS, {
-    variables: { userId: user?.id },
     onCompleted(data: { getAllCommentsByUser: Comment[] }) {
       setComments(data.getAllCommentsByUser.length);
     },

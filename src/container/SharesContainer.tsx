@@ -1,6 +1,6 @@
 import { gql, useLazyQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import ProjectsListing from "../components/ProjectListing";
+// import ProjectsListing from "../components/ProjectListing";
 import IProjectsListing from "../interfaces/IProjectsListing";
 import IOptionsSelected from "../interfaces/IOptionsSelected";
 
@@ -155,7 +155,7 @@ function SharesContainer() {
     loadData();
   }, [loadData]);
 
-  console.log(projectsSharedFiltered);
+  console.warn(projectsSharedFiltered);
   return (
     <div className="flex flex-col h-full gap-10 mx-32 my-10">
       <div className="flex flex-row gap-40 mb-8">
@@ -222,19 +222,19 @@ function SharesContainer() {
           </div>
         </div>
       </div>
-      {/*{projectsSharedFiltered.map((el) => (*/}
-      {/*  <ProjectsListing*/}
-      {/*    id={el.id}*/}
-      {/*    key={`sharedProject${el.id}`}*/}
-      {/*    name={el.name}*/}
-      {/*    description={el.description}*/}
-      {/*    updatedAt={el.updatedAt}*/}
-      {/*    user={el.user}*/}
-      {/*    comments={el.comments}*/}
-      {/*    likes={el.likes}*/}
-      {/*    isPublic={el.isPublic}*/}
-      {/*  />*/}
-      {/*))}*/}
+      {/* {projectsSharedFiltered.map((el) => ( */}
+      {/*  <ProjectsListing */}
+      {/*    id={el.id} */}
+      {/*    key={`sharedProject${el.id}`} */}
+      {/*    name={el.name} */}
+      {/*    description={el.description} */}
+      {/*    updatedAt={el.updatedAt} */}
+      {/*    user={el.user} */}
+      {/*    comments={el.comments} */}
+      {/*    likes={el.likes} */}
+      {/*    isPublic={el.isPublic} */}
+      {/*  /> */}
+      {/* ))} */}
     </div>
   );
 }
