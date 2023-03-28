@@ -1,14 +1,14 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import UserSpaceMyInformationsContainer from "../container/UserSpaceMyInformationsContainer";
 import UserSpaceMyProjectsContainer from "../container/UserSpaceMyProjectsContainer";
 import UserSpaceProjectSupportedContainer from "../container/UserSpaceProjectSupportedContainer";
 import UserSpaceMyAccountAccessContainer from "../container/UserSpaceMyAccountAccessContainer";
 import { UserContext } from "../contexts/UserContext";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 function UserSpaceScreen() {
   const { user } = useContext(UserContext);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // useEffect(() => {
   //   // eslint-disable-next-line @typescript-eslint/no-unused-expressions

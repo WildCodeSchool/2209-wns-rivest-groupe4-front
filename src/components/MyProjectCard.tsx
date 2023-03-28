@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ToggleSwitch } from "flowbite-react";
 import { gql, useMutation } from "@apollo/client";
-import { PencilSquareIcon } from "@heroicons/react/24/outline";
+// import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { ChatBubbleLeftIcon, HeartIcon } from "@heroicons/react/20/solid";
 import IProjectsListing from "../interfaces/IProjectsListing";
 import DeleteProjectModal from "./Modals/DeleteProjectModal";
@@ -13,14 +13,16 @@ type Props = {
 };
 
 const UPDATE_PUBLIC_STATE = gql`
-  mutation Mutation($modifyProjectId: Float!, $public: Boolean) {
-    modifyProject(id: $modifyProjectId, public: $public)
+  mutation Mutation($modifyProjectId: Float!, $isPublic: Boolean) {
+    modifyProject(id: $modifyProjectId, isPublic: $isPublic) {
+      id
+      isPublic
+    }
   }
 `;
 
 function MyProjectCard({ project }: Props) {
-  const { id, comments, name, description, updatedAt, user, likes, isPublic } =
-    project;
+  const { id, comments, name, description, likes, isPublic } = project;
 
   const [isPublicLocal, setIsPublicLocal] = useState(isPublic);
   const [modifyPublicState] = useMutation(UPDATE_PUBLIC_STATE);
@@ -28,7 +30,7 @@ function MyProjectCard({ project }: Props) {
   useEffect(() => {
     (async () => {
       await modifyPublicState({
-        variables: { modifyProjectId: Number(id), public: isPublicLocal },
+        variables: { modifyProjectId: Number(id), isPublic: isPublicLocal },
       });
     })();
   }, [id, isPublicLocal, modifyPublicState]);

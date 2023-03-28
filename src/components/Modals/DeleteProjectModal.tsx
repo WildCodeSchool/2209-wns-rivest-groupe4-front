@@ -45,7 +45,7 @@ function DeleteProjectModal({ projectId }: Props) {
               ) : (
                 <>
                   <Button color="failure" onClick={handleDelete}>
-                    Yes, I'm sure
+                    Yes, I&apos;m sure
                   </Button>
                   <Button color="gray" onClick={() => setShow(false)}>
                     No, cancel
