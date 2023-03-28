@@ -1,5 +1,7 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useContext } from "react";
 import { NavLink } from "react-router-dom";
+import AuthContext from "../contexts/AuthContext";
+import { UserContext } from "../contexts/UserContext";
 
 interface INavbarProps {
   opened: boolean;
@@ -7,17 +9,13 @@ interface INavbarProps {
 }
 
 function UserNavbar({ opened, setOpened }: INavbarProps) {
-  const token = localStorage.getItem("token");
-
-  const handleLogout = () => {
-    setOpened(!opened);
-    localStorage.clear();
-  };
+  const { user } = useContext(UserContext);
+  const { signOut } = useContext(AuthContext);
 
   return (
     <div>
       {opened ? (
-        !token ? (
+        !user ? (
           <div
             role="button"
             tabIndex={0}
@@ -94,8 +92,9 @@ function UserNavbar({ opened, setOpened }: INavbarProps) {
               </NavLink>
               <NavLink
                 to="/"
-                onClick={handleLogout}
-                onKeyDown={handleLogout}
+                onClick={() => {
+                  signOut();
+                }}
                 className="p-4 w-full h-full text-center hover:bg-black/40"
               >
                 <li className="flex flex-row justify-start items-center gap-4 ml-6">

@@ -1,11 +1,9 @@
-import { gql, useQuery } from "@apollo/client";
-import { useContext, useState } from "react";
-import { Button } from "flowbite-react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-
+import { Button } from "flowbite-react";
+import { gql, useQuery } from "@apollo/client";
 import IUser from "../interfaces/IUser";
 import ILike from "../interfaces/ILike";
-import { UserContext } from "../contexts/UserContext";
 
 const GET_ONE_USER = gql`
   query Query($getOneUserId: String!) {
@@ -35,18 +33,21 @@ const GET_USER_COMMENTS = gql`
   }
 `;
 
-function UserSpaceContainer() {
-  document.title = "Codeless4 | My Account";
-  const { user } = useContext(UserContext);
+const graduationColor = [
+  { min: 0, max: 20, color: "from-green-800 via-green-600 to-green-400" },
+  { min: 21, max: 40, color: "from-lime-800 via-lime-600 to-lime-400" },
+  { min: 41, max: 60, color: "from-yellow-800 via-yellow-600 to-yellow-400" },
+  { min: 61, max: 80, color: "from-orange-800 via-orange-600 to-orange-400" },
+  { min: 81, max: 100, color: "from-red-800 via-red-600 to-red-400" },
+];
 
+function UserSpaceMyAccountAccessContainer() {
   const [dailyRuns, setDailyRuns] = useState<number>(0);
   const [likes, setLikes] = useState<number>(0);
   const [comments, setComments] = useState<number>(0);
 
   const [isPremium, setIsPremium] = useState<boolean>(false);
-
   useQuery(GET_ONE_USER, {
-    variables: { getOneUserId: user?.id },
     onCompleted(data: { getOneUser: IUser }) {
       setIsPremium(data.getOneUser.premium);
       setDailyRuns(data.getOneUser.dailyRuns);
@@ -65,18 +66,8 @@ function UserSpaceContainer() {
     },
   });
 
-  const graduationColor = [
-    { min: 0, max: 20, color: "from-green-800 via-green-600 to-green-400" },
-    { min: 21, max: 40, color: "from-lime-800 via-lime-600 to-lime-400" },
-    { min: 41, max: 60, color: "from-yellow-800 via-yellow-600 to-yellow-400" },
-    { min: 61, max: 80, color: "from-orange-800 via-orange-600 to-orange-400" },
-    { min: 81, max: 100, color: "from-red-800 via-red-600 to-red-400" },
-  ];
-
   return (
-    <div className="flex flex-col h-full gap-16 mx-32 my-10">
-      <span className="bg-black w-full h-20" />
-
+    <>
       <div className="flex flex-col gap-3">
         <h1 className="font-aldrich text-3xl">My account access :</h1>
         <div className="flex items-center gap-2">
@@ -201,8 +192,8 @@ function UserSpaceContainer() {
           </NavLink>
         )}
       </div>
-    </div>
+    </>
   );
 }
 
-export default UserSpaceContainer;
+export default UserSpaceMyAccountAccessContainer;

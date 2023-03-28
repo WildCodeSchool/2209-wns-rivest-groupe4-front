@@ -5,20 +5,23 @@ import { NavLink, useNavigate } from "react-router-dom";
 import IProjectsListing from "../interfaces/IProjectsListing";
 
 const ADD_LIKE = gql`
-  mutation Mutation($idProject: Float!, $idUser: String!) {
-    addLike(idProject: $idProject, idUser: $idUser)
+  mutation Mutation($idProject: Float!) {
+    addLike(idProject: $idProject)
   }
 `;
 
 const DELETE_LIKE = gql`
-  mutation DeleteLike($idProject: Float!, $idUser: String!) {
-    deleteLike(idProject: $idProject, idUser: $idUser)
+  mutation DeleteLike($idProject: Float!) {
+    deleteLike(idProject: $idProject)
   }
 `;
 
 const MODIFY_PROJECT_PRIVACY = gql`
-  mutation Mutation($modifyProjectId: Float!, $public: Boolean) {
-    modifyProject(id: $modifyProjectId, public: $public)
+  mutation Mutation($modifyProjectId: Float!, $isPublic: Boolean) {
+    modifyProject(id: $modifyProjectId, isPublic: $isPublic) {
+      id
+      isPublic
+    }
   }
 `;
 
@@ -66,7 +69,7 @@ function ProjectsListing({
     changePrivacy({
       variables: {
         modifyProjectId: Number(id),
-        public: !isPublicProject,
+        isPublic: !isPublicProject,
       },
     });
   };
@@ -84,7 +87,6 @@ function ProjectsListing({
           deleteLike({
             variables: {
               idProject: Number(id),
-              idUser: localStorage.getItem("uuid"),
             },
           });
           setIsLiked(false);
@@ -93,7 +95,6 @@ function ProjectsListing({
           addLike({
             variables: {
               idProject: Number(id),
-              idUser: localStorage.getItem("uuid"),
             },
           });
           setIsLiked(true);

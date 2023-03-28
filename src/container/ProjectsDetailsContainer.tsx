@@ -82,8 +82,8 @@ const MODIFY_COMMENT = gql`
 `;
 
 const ADD_COMMENT = gql`
-  mutation Mutation($idProject: Float!, $comment: String!, $idUser: String!) {
-    addComment(idProject: $idProject, comment: $comment, idUser: $idUser) {
+  mutation Mutation($idProject: Float!, $comment: String!) {
+    addComment(idProject: $idProject, comment: $comment) {
       comment
       createdAt
       id
@@ -101,18 +101,20 @@ const ADD_COMMENT = gql`
 `;
 
 const ADD_LIKE = gql`
-  mutation Mutation($idProject: Float!, $idUser: String!) {
-    addLike(idProject: $idProject, idUser: $idUser)
+  mutation Mutation($idProject: Float!) {
+    addLike(idProject: $idProject)
   }
 `;
 
 const DELETE_LIKE = gql`
-  mutation DeleteLike($idProject: Float!, $idUser: String!) {
-    deleteLike(idProject: $idProject, idUser: $idUser)
+  mutation DeleteLike($idProject: Float!) {
+    deleteLike(idProject: $idProject)
   }
 `;
 
 function ProjectDetailsContainer() {
+  document.title = "Codeless4 | Details";
+
   const { idProject } = useParams<string>();
   const [projectDetails, setProjectDetails] = useState<IProjectsListing>();
   const [mainFolder, setMainFolder] = useState<IFolder>();
@@ -230,7 +232,6 @@ function ProjectDetailsContainer() {
       variables: {
         idProject: Number(idProject),
         comment: userComment,
-        idUser: localStorage.getItem("uuid"),
       },
     });
   };
@@ -288,7 +289,6 @@ function ProjectDetailsContainer() {
         deleteLike({
           variables: {
             idProject: Number(idProject),
-            idUser: localStorage.getItem("uuid"),
           },
         });
         setIsLiked(false);
@@ -297,7 +297,6 @@ function ProjectDetailsContainer() {
         addLike({
           variables: {
             idProject: Number(idProject),
-            idUser: localStorage.getItem("uuid"),
           },
         });
         setIsLiked(true);

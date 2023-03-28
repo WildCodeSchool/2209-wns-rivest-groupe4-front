@@ -1,10 +1,11 @@
-import { useForm, SubmitHandler } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { Button } from "flowbite-react";
-
-import { Link, NavLink, useNavigate } from "react-router-dom";
 import { gql, useLazyQuery } from "@apollo/client";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Button } from "flowbite-react";
+import { useContext } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import * as yup from "yup";
+import AuthContext from "../contexts/AuthContext";
 import ILoginFormValues from "../interfaces/ILoginFormValues";
 import ITokenWithUserValues from "../interfaces/ITokenWithUser";
 
@@ -38,12 +39,15 @@ const schema = yup
   .required();
 
 function LoginContainer() {
+  document.title = "Codeless4 | Login";
+
   const navigate = useNavigate();
+
+  const { signIn } = useContext(AuthContext);
   const [login, { error }] = useLazyQuery(GET_TOKEN_WITH_USER, {
     onCompleted(data: { getTokenWithUser: ITokenWithUserValues }) {
-      localStorage.setItem("token", data.getTokenWithUser.token);
-      localStorage.setItem("uuid", data.getTokenWithUser.user.id);
-      navigate("/");
+      signIn(data.getTokenWithUser);
+      navigate(-1);
     },
   });
 

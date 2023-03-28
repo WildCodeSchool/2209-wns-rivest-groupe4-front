@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Button } from "flowbite-react";
 
 function PremiumScreen() {
+  document.title = "Codeless4 | Premium";
+
   const [planSelected, setPlanSelected] = useState<number>(0);
 
   const handleChangePlan = (nb: number) => {
