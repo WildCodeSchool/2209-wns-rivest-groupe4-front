@@ -1,3 +1,4 @@
+import { gql, useLazyQuery } from "@apollo/client";
 import { useForm } from "react-hook-form";
 import { Button } from "flowbite-react";
 
@@ -7,8 +8,20 @@ type FormValues = {
   reason: string;
 };
 
+const SEND_MAIL = gql`
+  query Query($name: String!, $email: String!, $reason: String!) {
+    SendMail(name: $name, email: $email, reason: $reason)
+  }
+`;
+
 function ContactScreen() {
   document.title = "Codeless4 | Contact";
+
+  const [mail] = useLazyQuery(SEND_MAIL, {
+    onCompleted(data: { SendMail: FormValues }) {
+      console.warn(data);
+    },
+  });
 
   const {
     register,
@@ -17,16 +30,9 @@ function ContactScreen() {
     formState: { errors },
   } = useForm<FormValues>();
   const onSubmit = handleSubmit((data) => {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    };
-    fetch("http://localhost:5005/sendMail", requestOptions)
-      .then((res) => {
-        console.warn("mail was send", res);
-      })
-      .catch((err) => console.error(err));
+    mail({
+      variables: data,
+    });
     reset();
   });
 
