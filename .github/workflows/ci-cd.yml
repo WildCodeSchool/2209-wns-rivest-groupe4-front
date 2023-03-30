@@ -48,8 +48,7 @@ jobs:
           push: true
           context: "{{defaultContext}}"
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/codeless4-front:staging
-            ${{ secrets.DOCKERHUB_USERNAME }}/codeless4-front:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/codeless4-frontend-staging:latest
 
   deploy-production:
     needs: test-front
@@ -78,4 +77,4 @@ jobs:
           push: true
           context: "{{defaultContext}}"
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/codeless4-front:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/codeless4-frontend-production:latest
