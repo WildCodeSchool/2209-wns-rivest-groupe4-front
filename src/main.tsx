@@ -12,7 +12,10 @@ import "./index.css";
 import App from "./App";
 
 const httpLink = createHttpLink({
-  uri: "http://localhost:5001/",
+  uri:
+    process.env.NODE_ENV === "production"
+      ? "/graphql"
+      : "http://localhost:5001/",
 });
 
 const authLink = setContext((_, { headers }) => {
