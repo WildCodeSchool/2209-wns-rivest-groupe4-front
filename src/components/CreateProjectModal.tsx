@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import {
   Button,
   Checkbox,
@@ -9,20 +9,12 @@ import {
 } from "flowbite-react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const CREATE_PROJECT = gql`
-  mutation CreateProject(
-    $description: String!
-    $name: String!
-    $public: Boolean!
-  ) {
-    createProject(description: $description, name: $name, isPublic: $public) {
-      id
-    }
-  }
-`;
+import { GET_PROJECTS } from "../apollo/queries";
+import useLoggedUser from "../hooks/useLoggedUser";
+import { CREATE_PROJECT } from "../apollo/mutations";
 
 export default function CreateProjectModal() {
+  const { user } = useLoggedUser();
   const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
   const [newProjectData, setNewProjectData] = useState({
     name: "",
@@ -32,8 +24,13 @@ export default function CreateProjectModal() {
 
   const navigate = useNavigate();
 
+  const { refetch } = useQuery(GET_PROJECTS, {
+    variables: { userId: user?.id },
+  });
+
   const [createProject, { loading, error }] = useMutation(CREATE_PROJECT, {
-    onCompleted: (data) => {
+    onCompleted: async (data) => {
+      refetch();
       navigate(`/editor/${data.createProject.id}`);
     },
   });

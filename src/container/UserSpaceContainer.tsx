@@ -1,23 +1,9 @@
 import { gql, useQuery } from "@apollo/client";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Button } from "flowbite-react";
 import { NavLink } from "react-router-dom";
-
-import IUser from "../interfaces/IUser";
 import ILike from "../interfaces/ILike";
-import { UserContext } from "../contexts/UserContext";
-
-const GET_ONE_USER = gql`
-  query Query($getOneUserId: String!) {
-    getOneUser(id: $getOneUserId) {
-      email
-      dailyRuns
-      hashedPassword
-      premium
-      pseudo
-    }
-  }
-`;
+import useLoggedUser from "../hooks/useLoggedUser";
 
 const GET_USER_LIKES = gql`
   query Query {
@@ -37,21 +23,10 @@ const GET_USER_COMMENTS = gql`
 
 function UserSpaceContainer() {
   document.title = "Codeless4 | My Account";
-  const { user } = useContext(UserContext);
+  const { user } = useLoggedUser();
 
-  const [dailyRuns, setDailyRuns] = useState<number>(0);
   const [likes, setLikes] = useState<number>(0);
   const [comments, setComments] = useState<number>(0);
-
-  const [isPremium, setIsPremium] = useState<boolean>(false);
-
-  useQuery(GET_ONE_USER, {
-    variables: { getOneUserId: user?.id },
-    onCompleted(data: { getOneUser: IUser }) {
-      setIsPremium(data.getOneUser.premium);
-      setDailyRuns(data.getOneUser.dailyRuns);
-    },
-  });
 
   useQuery(GET_USER_LIKES, {
     onCompleted(data: { getAllLikesByUser: ILike[] }) {
@@ -82,44 +57,44 @@ function UserSpaceContainer() {
         <div className="flex items-center gap-2">
           <p
             className={
-              isPremium
+              user.premium
                 ? "bg-gradient-to-r bg-clip-text text-transparent from-orange-800 via-orange-500 to-yellow-600 animate-premiumColorChanging text-xl font-bold"
                 : "text-lime-700 text-xl font-bold"
             }
           >
-            ● {!isPremium ? "Free" : "Premium"} account
+            ● {!user.premium ? "Free" : "Premium"} account
           </p>
         </div>
       </div>
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <p>Number of runs today</p>
-          {!isPremium ? (
+          {!user.premium ? (
             <div className="flex items-center w-full bg-white rounded-sm h-6">
               <p
                 className={`font-bold text-black flex justify-center bg-gradient-to-r animate-premiumColorChanging${
                   graduationColor[
                     graduationColor.findIndex(
                       (el) =>
-                        el.min <= (dailyRuns / 50) * 100 &&
-                        el.max >= (dailyRuns / 50) * 100,
+                        el.min <= (user.dailyRuns / 50) * 100 &&
+                        el.max >= (user.dailyRuns / 50) * 100,
                     )
                   ].color
                 }`}
-                style={{ width: `${(dailyRuns / 50) * 100}%` }}
+                style={{ width: `${(user.dailyRuns / 50) * 100}%` }}
               >
-                {dailyRuns > 0 && dailyRuns}
+                {user.dailyRuns > 0 && user.dailyRuns}
               </p>
               <p
                 className="font-bold text-black flex justify-center"
-                style={{ width: `${((50 - dailyRuns) / 50) * 100}%` }}
+                style={{ width: `${((50 - user.dailyRuns) / 50) * 100}%` }}
               >
-                {50 - dailyRuns > 0 && 50 - dailyRuns}
+                {50 - user.dailyRuns > 0 && 50 - user.dailyRuns}
               </p>
             </div>
           ) : (
             <div className="flex items-center justify-center w-full rounded-sm h-6 font-bold text-black bg-gradient-to-r from-green-800 via-green-600 to-green-400 animate-premiumColorChanging">
-              {dailyRuns} / ∞
+              {user.dailyRuns} / ∞
             </div>
           )}
         </div>
@@ -127,7 +102,7 @@ function UserSpaceContainer() {
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <p>Number of likes this month</p>
-          {!isPremium ? (
+          {!user.premium ? (
             <div className="flex items-center justify-center w-full bg-white rounded-sm h-6">
               <p
                 className={`font-bold text-black flex justify-center bg-gradient-to-r animate-premiumColorChanging ${
@@ -160,7 +135,7 @@ function UserSpaceContainer() {
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <p>Number commentaries this month</p>
-          {!isPremium ? (
+          {!user.premium ? (
             <div className="flex items-center justify-center w-full bg-white rounded-sm h-6">
               <p
                 className={`font-bold text-black flex justify-center bg-gradient-to-r animate-premiumColorChanging ${
@@ -189,7 +164,7 @@ function UserSpaceContainer() {
             </div>
           )}
         </div>
-        {!isPremium && (
+        {!user.premium && (
           <NavLink className="mx-auto mt-14 w-1/5" to="/premium">
             <Button
               type="submit"

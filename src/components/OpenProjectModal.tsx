@@ -1,31 +1,24 @@
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { Button, ListGroup, Modal, Spinner } from "flowbite-react";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../contexts/UserContext";
-
-const GET_PROJECTS = gql`
-  query GetProjectsByUserId($userId: String!) {
-    getProjectsByUserId(userId: $userId) {
-      name
-      id
-    }
-  }
-`;
+import useLoggedUser from "../hooks/useLoggedUser";
+import { GET_PROJECTS } from "../apollo/queries";
 
 export default function OpenProjectModal() {
-  const { user } = useContext(UserContext);
+  const { user, loading: userIsLoading } = useLoggedUser();
+
   const [showOpenProjectModal, setShowOpenProjectModal] = useState(false);
 
   const navigate = useNavigate();
 
   const { loading, error, data } = useQuery(GET_PROJECTS, {
+    skip: user.id === undefined,
     variables: { userId: user?.id },
   });
-
-  console.warn(error);
-
   // TODO gérer les erreurs
+
+  if (userIsLoading) return null;
 
   return (
     <>
