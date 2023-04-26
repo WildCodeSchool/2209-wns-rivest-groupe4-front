@@ -50,3 +50,30 @@ export const GET_PROJECTS = gql`
     }
   }
 `;
+
+export const GET_CHOSEN_PROJECT = gql`
+  query GetOneProject($id: Float!) {
+    getOneProject(id: $id) {
+      id
+      description
+      createdAt
+      name
+      isPublic
+      updatedAt
+    }
+    getAllFoldersByProjectId(idProject: $id) {
+      name
+      id
+      parentFolder {
+        name
+        id
+      }
+      files {
+        id
+        content
+        extension
+        name
+      }
+    }
+  }
+`;

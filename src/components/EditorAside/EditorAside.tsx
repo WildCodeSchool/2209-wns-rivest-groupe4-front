@@ -1,15 +1,38 @@
-/* eslint-disable prettier/prettier */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-import { Tooltip } from "flowbite-react";
+import { useMutation } from "@apollo/client";
 import React, { useState } from "react";
-import { ExistingProjectQueryResult } from "../../container/EditorContainer/types";
+import {
+  CreateFileMutationVariables,
+  CreateFolderMutationVariables,
+  ExistingProjectQueryResult,
+  RenameFileMutationVariables,
+  RenameFolderMutationVariables,
+} from "../../container/EditorContainer/types";
 import IFile from "../../interfaces/IFile";
 import IFolderTree from "../../interfaces/IFolderTree";
+import {
+  ADD_FILE,
+  ADD_FOLDER,
+  DELETE_FILE,
+  DELETE_FOLDER,
+  RENAME_FILE,
+  RENAME_FOLDER,
+} from "../../apollo/mutations";
+import CustomTooltip from "./Tooltip/CustomTooltip";
+import AddFolderModal from "./Modals/AddFolderModal";
+import AddFileModal from "./Modals/AddFileModal";
+import DeleteModal from "./Modals/DeleteModal";
+import RenameModal from "./Modals/RenameModal";
 
 interface Props {
   projectData: ExistingProjectQueryResult;
   setCurrentFile: (file: IFile) => void;
+}
+
+interface MenuVisibility {
+  file?: string;
+  folder?: string;
 }
 
 const createTree = (folders: IFolderTree[]) => {
@@ -39,7 +62,38 @@ function FolderTree({
 }) {
   const [openFolders, setOpenFolders] = useState<string[]>([]);
   const [isCollapsed, setIsCollapsed] = useState<string>("");
-  const [menuVisibility, setMenuVisibility] = useState<string>("");
+  const [menuVisibility, setMenuVisibility] = useState<MenuVisibility>({});
+  const [newFolderName, setNewFolderName] = useState<string>("");
+  const [newFileName, setNewFileName] = useState<string>("");
+
+  // MODALS
+  const [showAddFolderModal, setShowAddFolderModal] = useState<{
+    parentFolder: string;
+  } | null>(null);
+  const [showAddFileModal, setShowAddFileModal] = useState<{
+    parentFolder: string;
+  } | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState<{
+    type: string;
+    id: string;
+  } | null>(null);
+  const [showRenameModal, setShowRenameModal] = useState<{
+    type: string;
+    id: string;
+  } | null>(null);
+
+  // MUTATIIONS
+  const [addFolder] = useMutation(ADD_FOLDER);
+
+  const [addFile] = useMutation(ADD_FILE);
+
+  const [deleteFolder] = useMutation(DELETE_FOLDER);
+
+  const [deleteFile] = useMutation(DELETE_FILE);
+
+  const [renameFolder] = useMutation(RENAME_FOLDER);
+
+  const [renameFile] = useMutation(RENAME_FILE);
 
   const toggleFolder = (id: string) => {
     if (openFolders.includes(id)) {
@@ -48,13 +102,96 @@ function FolderTree({
       setOpenFolders([...openFolders, id]);
     }
   };
+
   const handleFolderHover = (folderId: string) => {
-    setMenuVisibility(folderId);
+    setMenuVisibility({ folder: folderId });
+  };
+
+  const handleFileHover = (fileId: string) => {
+    setMenuVisibility({ file: fileId });
+  };
+
+  const handleCreateFolder = ({
+    folderId,
+    name,
+  }: CreateFolderMutationVariables) => {
+    addFolder({
+      variables: {
+        parentFolderId: parseInt(folderId, 10),
+        name,
+      },
+      onCompleted() {
+        setNewFolderName("");
+        setShowAddFolderModal(null);
+      },
+    });
+  };
+
+  const handleCreateFile = ({
+    folderId,
+    name,
+  }: CreateFileMutationVariables) => {
+    const fileName = name.split(".")[0];
+    const extension = name.split(".")[1];
+    addFile({
+      variables: {
+        parentFolderId: parseInt(folderId, 10),
+        extension,
+        name: fileName,
+      },
+      onCompleted() {
+        setNewFileName("");
+        setShowAddFileModal(null);
+      },
+    });
+  };
+
+  const handleDeleteFolder = (folderId: number) => {
+    deleteFolder({
+      variables: {
+        folderId,
+      },
+      onCompleted() {
+        setShowDeleteModal(null);
+      },
+    });
+  };
+
+  const handleDeleteFile = (fileId: number) => {
+    deleteFile({
+      variables: {
+        fileId,
+      },
+      onCompleted() {
+        setShowDeleteModal(null);
+      },
+    });
+  };
+
+  const handleRenameFolder = ({
+    folderId,
+    name,
+  }: RenameFolderMutationVariables) => {
+    renameFolder({
+      variables: {
+        folderId,
+        name,
+      },
+    });
+  };
+
+  const handleRenameFile = ({ fileId, name }: RenameFileMutationVariables) => {
+    renameFile({
+      variables: {
+        idFile: fileId,
+        name,
+      },
+    });
   };
 
   const handleCollapsable = (folderId: string) => {
     if (isCollapsed === folderId) {
-      setIsCollapsed('')
+      setIsCollapsed("");
     } else {
       setIsCollapsed(folderId);
     }
@@ -65,8 +202,9 @@ function FolderTree({
       {tree.map((folder) => (
         <div className="ml-4 cursor-pointer" key={folder.id}>
           <div
-            className={`${menuVisibility === folder.id && "bg-sky-500/[.06]"
-              } flex justify-between`}
+            className={`${
+              menuVisibility.folder === folder.id && "bg-sky-500/[.06]"
+            } flex justify-between`}
             onMouseEnter={() => {
               handleFolderHover(folder.id);
             }}
@@ -93,35 +231,26 @@ function FolderTree({
                 </span>
               )}
             </div>
-            {menuVisibility === folder.id && (
-              <div className="inline-block px-2">
-                <Tooltip
-                  arrow={false}
-                  placement="right"
-                  content={
-                    <>
-                      <button className="block" type="button">
-                        Create folder
-                      </button>
-                      <button className="block" type="button">
-                        Create file
-                      </button>
-                      <button className="block" type="button">
-                        Delete
-                      </button>
-                      <button className="block" type="button">
-                        Rename
-                      </button>
-                    </>
-                  }
-                  trigger="click"
-                >
-                  ...
-                </Tooltip>
-              </div>
+            {menuVisibility.folder === folder.id && (
+              <CustomTooltip
+                type="folder"
+                setShowAddFolderModal={() =>
+                  setShowAddFolderModal({ parentFolder: folder.id })
+                }
+                setShowAddFileModal={() =>
+                  setShowAddFileModal({ parentFolder: folder.id })
+                }
+                setShowDeleteModal={() =>
+                  setShowDeleteModal({ type: "folder", id: folder.id })
+                }
+                setShowRenameModal={() =>
+                  setShowRenameModal({ type: "folder", id: folder.id })
+                }
+              />
             )}
           </div>
-          {folder.children && isCollapsed === folder.id &&
+          {folder.children &&
+            isCollapsed === folder.id &&
             (openFolders.includes(folder.id) ? (
               <FolderTree
                 setCurrentFile={setCurrentFile}
@@ -129,13 +258,82 @@ function FolderTree({
               />
             ) : null)}
           {folder.files &&
-            folder.files.map((file) => (
-              <div className='ml-4' onClick={() => setCurrentFile(file)} key={file.name}>
-                {file.name}.{file.extension}
-              </div>
-            ))}
+            folder.files.map((file: IFile) => {
+              return (
+                <div
+                  key={file.id}
+                  className={`${
+                    menuVisibility.file === file.id && "bg-sky-500/[.06]"
+                  } flex justify-between`}
+                  onClick={() => setCurrentFile(file)}
+                  onMouseEnter={() => {
+                    if (file.id) {
+                      handleFileHover(file.id.toString());
+                    }
+                  }}
+                  onMouseLeave={() => handleFileHover("")}
+                >
+                  <div key={file.name}>
+                    {file.name}.{file.extension}
+                  </div>
+                  {menuVisibility.file === file.id && file.id && (
+                    <CustomTooltip
+                      type="file"
+                      setShowAddFolderModal={() =>
+                        setShowAddFolderModal({ parentFolder: folder.id })
+                      }
+                      setShowAddFileModal={() =>
+                        setShowAddFileModal({ parentFolder: folder.id })
+                      }
+                      setShowDeleteModal={() => {
+                        if (file.id) {
+                          setShowDeleteModal({
+                            type: "file",
+                            id: file.id?.toString(),
+                          });
+                        }
+                      }}
+                      setShowRenameModal={() => {
+                        if (file.id) {
+                          setShowRenameModal({
+                            type: "file",
+                            id: file.id.toString(),
+                          });
+                        }
+                      }}
+                    />
+                  )}
+                </div>
+              );
+            })}
         </div>
       ))}
+      <AddFolderModal
+        showAddFolderModal={showAddFolderModal}
+        setShowAddFolderModal={setShowAddFolderModal}
+        newFolderName={newFolderName}
+        setNewFolderName={setNewFolderName}
+        onSubmit={handleCreateFolder}
+      />
+      <AddFileModal
+        showAddFileModal={showAddFileModal}
+        setShowAddFileModal={setShowAddFileModal}
+        newFileName={newFileName}
+        setNewFileName={setNewFileName}
+        onSubmit={handleCreateFile}
+      />
+      <DeleteModal
+        showDeleteModal={showDeleteModal}
+        setShowDeleteModal={setShowDeleteModal}
+        deleteFolder={handleDeleteFolder}
+        deleteFile={handleDeleteFile}
+      />
+      <RenameModal
+        showRenameModal={showRenameModal}
+        setShowRenameModal={setShowRenameModal}
+        renameFolder={handleRenameFolder}
+        renameFile={handleRenameFile}
+      />
     </>
   );
 }

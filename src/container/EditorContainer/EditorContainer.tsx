@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { Breadcrumb, Button, Spinner } from "flowbite-react";
 import { useState } from "react";
 
@@ -15,49 +15,8 @@ import InputEditor from "../../components/InputEditor/InputEditor";
 import ReturnEditor from "../../components/ReturnEditor";
 import IFile from "../../interfaces/IFile";
 import { ExistingProjectQueryResult } from "./types";
-
-export const GET_CHOSEN_PROJECT = gql`
-  query GetOneProject($id: Float!) {
-    getOneProject(id: $id) {
-      id
-      description
-      createdAt
-      name
-      isPublic
-      updatedAt
-    }
-    getAllFoldersByProjectId(idProject: $id) {
-      name
-      id
-      parentFolder {
-        name
-        id
-      }
-      files {
-        id
-        content
-        extension
-        name
-      }
-    }
-  }
-`;
-
-const SAVE_PROJECT = gql`
-  mutation ModifyFile(
-    $idFile: Float!
-    $fileName: String
-    $fileContent: String
-    $fileExtension: String
-  ) {
-    modifyFile(
-      idFile: $idFile
-      name: $fileName
-      content: $fileContent
-      extension: $fileExtension
-    )
-  }
-`;
+import { SAVE_PROJECT } from "../../apollo/mutations";
+import { GET_CHOSEN_PROJECT } from "../../apollo/queries";
 
 function EditorContainer() {
   document.title = "Codeless4 | Editor";
