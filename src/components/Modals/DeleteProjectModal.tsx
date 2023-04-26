@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { ExclamationCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Button, Modal, Spinner } from "flowbite-react";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import { GET_PROJECTS } from "../../apollo/queries";
+import useLoggedUser from "../../hooks/useLoggedUser";
 
 type Props = {
   projectId: number;
@@ -15,8 +17,14 @@ const DELETE_PROJECT = gql`
 
 function DeleteProjectModal({ projectId }: Props) {
   const [show, setShow] = useState(false);
+  const { user } = useLoggedUser();
 
-  const [deleteProject, { loading }] = useMutation(DELETE_PROJECT);
+  const { refetch } = useQuery(GET_PROJECTS, {
+    variables: { userId: user?.id },
+  });
+  const [deleteProject, { loading }] = useMutation(DELETE_PROJECT, {
+    onCompleted: refetch,
+  });
 
   const handleDelete = async () => {
     await deleteProject({
