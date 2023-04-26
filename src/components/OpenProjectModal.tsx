@@ -12,7 +12,7 @@ export default function OpenProjectModal() {
 
   const navigate = useNavigate();
 
-  const { loading, error, data } = useQuery(GET_PROJECTS, {
+  const { loading, data } = useQuery(GET_PROJECTS, {
     skip: user.id === undefined,
     variables: { userId: user?.id },
   });
