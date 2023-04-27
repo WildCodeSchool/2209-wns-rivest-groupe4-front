@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { NetworkStatus, useMutation, useQuery } from "@apollo/client";
 import { Breadcrumb, Button, Spinner } from "flowbite-react";
 import { useState } from "react";
 
@@ -47,7 +47,7 @@ function EditorContainer() {
     },
   });
 
-  const { loading } = useQuery(GET_CHOSEN_PROJECT, {
+  const { loading, networkStatus, refetch } = useQuery(GET_CHOSEN_PROJECT, {
     variables: { id: Number(idProject) },
     onCompleted: (data) => {
       setCurrentProject(data);
@@ -76,7 +76,7 @@ function EditorContainer() {
     saveFile();
   };
 
-  if (loading) return <Spinner />;
+  if (loading || networkStatus === NetworkStatus.refetch) return <Spinner />;
 
   return (
     <div className="flex flex-row h-full">
@@ -84,6 +84,7 @@ function EditorContainer() {
         <EditorAside
           setCurrentFile={setCurrentFile}
           projectData={currentProject}
+          refetch={refetch}
         />
       )}
       <div className="h-full w-full flex flex-col">

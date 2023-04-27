@@ -28,6 +28,7 @@ import RenameModal from "./Modals/RenameModal";
 interface Props {
   projectData: ExistingProjectQueryResult;
   setCurrentFile: (file: IFile) => void;
+  refetch: () => void;
 }
 
 interface MenuVisibility {
@@ -56,9 +57,11 @@ const createTree = (folders: IFolderTree[]) => {
 function FolderTree({
   tree,
   setCurrentFile,
+  refetch,
 }: {
   tree: IFolderTree[];
   setCurrentFile: (file: IFile) => void;
+  refetch: () => void;
 }) {
   const [openFolders, setOpenFolders] = useState<string[]>([]);
   const [isCollapsed, setIsCollapsed] = useState<string>("");
@@ -123,7 +126,20 @@ function FolderTree({
       onCompleted() {
         setNewFolderName("");
         setShowAddFolderModal(null);
+        refetch();
       },
+      // optimisticResponse: {
+      //   __typename: "Mutation",
+      //   addFolder: {
+      //     __typename: "Folder",
+      //     id: -1,
+      //     name,
+      //     parentFolder: {
+      //       __typename: "Folder",
+      //       id: parseInt(folderId, 10),
+      //     },
+      //   },
+      // },
     });
   };
 
@@ -142,6 +158,7 @@ function FolderTree({
       onCompleted() {
         setNewFileName("");
         setShowAddFileModal(null);
+        refetch();
       },
     });
   };
@@ -153,6 +170,7 @@ function FolderTree({
       },
       onCompleted() {
         setShowDeleteModal(null);
+        refetch();
       },
     });
   };
@@ -164,6 +182,7 @@ function FolderTree({
       },
       onCompleted() {
         setShowDeleteModal(null);
+        refetch();
       },
     });
   };
@@ -177,6 +196,9 @@ function FolderTree({
         folderId,
         name,
       },
+      onCompleted() {
+        refetch();
+      },
     });
   };
 
@@ -185,6 +207,9 @@ function FolderTree({
       variables: {
         idFile: fileId,
         name,
+      },
+      onCompleted() {
+        refetch();
       },
     });
   };
@@ -255,16 +280,18 @@ function FolderTree({
               <FolderTree
                 setCurrentFile={setCurrentFile}
                 tree={folder.children}
+                refetch={refetch}
               />
             ) : null)}
           {folder.files &&
+            isCollapsed === folder.id &&
             folder.files.map((file: IFile) => {
               return (
                 <div
                   key={file.id}
                   className={`${
                     menuVisibility.file === file.id && "bg-sky-500/[.06]"
-                  } flex justify-between`}
+                  } flex justify-between ml-4`}
                   onClick={() => setCurrentFile(file)}
                   onMouseEnter={() => {
                     if (file.id) {
@@ -338,7 +365,7 @@ function FolderTree({
   );
 }
 
-function EditorAside({ projectData, setCurrentFile }: Props) {
+function EditorAside({ projectData, setCurrentFile, refetch }: Props) {
   return (
     <aside
       className="w-[15%] bg-[#20252D] py-2"
@@ -351,6 +378,7 @@ function EditorAside({ projectData, setCurrentFile }: Props) {
       <FolderTree
         setCurrentFile={setCurrentFile}
         tree={createTree(projectData.getAllFoldersByProjectId)}
+        refetch={refetch}
       />
     </aside>
   );
