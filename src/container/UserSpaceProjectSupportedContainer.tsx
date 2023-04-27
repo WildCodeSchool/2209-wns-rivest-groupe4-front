@@ -1,9 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { NavLink } from "react-router-dom";
 import { Button } from "flowbite-react";
 import IProjectsListing from "../interfaces/IProjectsListing";
-import { UserContext } from "../contexts/UserContext";
+import useLoggedUser from "../hooks/useLoggedUser";
 
 const GET_PROJECTS_SUPPORTED = gql`
   query Query($userId: String!) {
@@ -32,7 +32,7 @@ const GET_PROJECTS_SUPPORTED = gql`
 `;
 
 function UserSpaceProjectSupportedContainer() {
-  const { user } = useContext(UserContext);
+  const { user } = useLoggedUser();
 
   const [supportedProjects, setSupportedProject] =
     useState<IProjectsListing[]>();

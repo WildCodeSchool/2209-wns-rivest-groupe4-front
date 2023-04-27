@@ -1,37 +1,12 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Button, Spinner } from "flowbite-react";
-import { gql, useMutation, useQuery } from "@apollo/client";
-import { UserContext } from "../contexts/UserContext";
-import IUser from "../interfaces/IUser";
+import { useMutation } from "@apollo/client";
+import { MODIFY_USER } from "../apollo/mutations";
+import useLoggedUser from "../hooks/useLoggedUser";
 
-const GET_ONE_USER = gql`
-  query Query($getOneUserId: String!) {
-    getOneUser(id: $getOneUserId) {
-      email
-      dailyRuns
-      premium
-      pseudo
-    }
-  }
-`;
-
-const MODIFY_USER = gql`
-  mutation ModifyUser(
-    $modifyUserId: String!
-    $email: String
-    $password: String
-    $pseudo: String
-  ) {
-    modifyUser(
-      id: $modifyUserId
-      email: $email
-      password: $password
-      pseudo: $pseudo
-    )
-  }
-`;
 function UserSpaceMyInformationsContainer() {
-  const { user } = useContext(UserContext);
+  const { user, refetch } = useLoggedUser();
+
   const [userUpdates, setUserUpdates] = useState<{
     email?: string;
     pseudo?: string;
@@ -41,22 +16,16 @@ function UserSpaceMyInformationsContainer() {
     pseudo: user?.pseudo,
   });
 
-  useQuery(GET_ONE_USER, {
-    variables: { getOneUserId: user?.id },
-    onCompleted(data: { getOneUser: IUser }) {
-      console.warn(data);
-      // TODO refresh user context and local storage
-      // TODO confirm update with success toast
-    },
+  const [modifyUser, { loading }] = useMutation(MODIFY_USER, {
+    onCompleted: refetch,
   });
-
-  const [modifyUser, { loading }] = useMutation(MODIFY_USER);
 
   const handleClickModify = async () => {
     await modifyUser({
-      variables: { ...userUpdates, modifyUserId: user?.id },
+      variables: { ...userUpdates, modifyUserId: user.id },
     });
   };
+  // TODO confirm update with success toast
 
   return (
     <div className="mt-10 sm:mt-0">

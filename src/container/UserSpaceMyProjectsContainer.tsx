@@ -1,39 +1,15 @@
-import React, { useContext, useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import React, { useState } from "react";
+import { useQuery } from "@apollo/client";
 import MyProjectCard from "../components/MyProjectCard";
 import IProjectsListing from "../interfaces/IProjectsListing";
-import { UserContext } from "../contexts/UserContext";
+import useLoggedUser from "../hooks/useLoggedUser";
+import { GET_PROJECTS } from "../apollo/queries";
 
-const GET_USER_PROJECTS = gql`
-  query Query($userId: String!) {
-    getProjectsByUserId(userId: $userId) {
-      comments {
-        id
-      }
-      likes {
-        user {
-          id
-          pseudo
-        }
-      }
-      createdAt
-      description
-      updatedAt
-      name
-      isPublic
-      id
-      user {
-        id
-        pseudo
-      }
-    }
-  }
-`;
 function UserSpaceMyProjectsContainer() {
-  const { user } = useContext(UserContext);
+  const { user } = useLoggedUser();
   const [userProjects, setUserProjects] = useState<IProjectsListing[]>();
 
-  useQuery(GET_USER_PROJECTS, {
+  useQuery(GET_PROJECTS, {
     variables: { userId: user?.id },
     onCompleted(data: { getProjectsByUserId: IProjectsListing[] }) {
       setUserProjects(data.getProjectsByUserId);
