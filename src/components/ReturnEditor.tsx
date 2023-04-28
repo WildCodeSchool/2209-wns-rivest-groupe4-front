@@ -1,45 +1,41 @@
-import { gql, useQuery } from "@apollo/client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AceEditor from "react-ace";
+import axios from "axios";
 
 interface Props {
   codeToQuery: string;
+  fileExtension: string;
 }
-
-const POST_CODE = gql`
-  query postCode($code: String!) {
-    postCode(code: $code)
-  }
-`;
 
 export const encodeBase64 = (data: string) => {
   return Buffer.from(data).toString("base64");
 };
 
-function ReturnEditor({ codeToQuery }: Props) {
+function ReturnEditor({ codeToQuery, fileExtension }: Props) {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [returnedValue, setReturnedValue] = useState<string>("");
-  const { loading, error, data } = useQuery(POST_CODE, {
-    variables: { code: btoa(codeToQuery) },
-  });
 
-  useEffect(() => {
-    if (error) {
-      setReturnedValue(error.message);
-    }
-    if (loading) {
-      setReturnedValue("Loading...");
-    }
-    if (data) {
-      setReturnedValue(data.postCode);
-    }
-  }, [returnedValue, data, error, loading]);
+  axios({
+    method: "post",
+    url: "http://localhost:7008/compiler/file",
+    data: {
+      code: btoa(codeToQuery).toString(),
+      fileExtension,
+    },
+  })
+    .then((response) => {
+      setReturnedValue(response.data);
+    })
+    .catch((error) => {
+      setReturnedValue(error);
+    })
+    .finally(() => setIsLoading(false));
 
   return (
     <AceEditor
-      value={returnedValue}
+      value={isLoading ? "Loading..." : returnedValue}
       mode="javascript"
       theme="twilight"
-      // TODO create function to handle behaviour
       name="code_result"
       showGutter
       readOnly

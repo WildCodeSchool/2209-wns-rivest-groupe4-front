@@ -18,7 +18,7 @@ import SharesScreen from "./screens/SharesScreen";
 import UserSpaceScreen from "./screens/UserSpaceScreen";
 import useLoggedUser from "./hooks/useLoggedUser";
 
-type ReducerState = {
+export type ReducerState = {
   isLoading: boolean;
   isSignout: boolean;
   userToken: string | null | undefined;
@@ -93,8 +93,9 @@ function App() {
         localStorage.setItem("token", data.token);
         dispatch({ type: "SIGN_IN", token: data.token });
       },
+      authState,
     }),
-    [],
+    [authState],
   );
   return (
     <AuthContext.Provider value={authContext}>

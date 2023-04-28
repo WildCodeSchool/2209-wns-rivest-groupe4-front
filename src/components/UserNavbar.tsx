@@ -10,12 +10,12 @@ interface INavbarProps {
 
 function UserNavbar({ opened, setOpened }: INavbarProps) {
   const { user } = useLoggedUser();
-  const { signOut } = useContext(AuthContext);
+  const { signOut, authState } = useContext(AuthContext);
 
   return (
     <div>
       {opened ? (
-        !user ? (
+        authState.isSignout ? (
           <div
             role="button"
             tabIndex={0}
