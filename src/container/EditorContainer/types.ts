@@ -28,3 +28,23 @@ export interface ExistingProjectQueryResult {
 export interface ExistingProjectQueryVariables {
   id: number;
 }
+
+export interface CreateFolderMutationVariables {
+  folderId: string;
+  name: string;
+}
+
+export interface CreateFileMutationVariables {
+  folderId: string;
+  name: string;
+}
+
+export interface RenameFolderMutationVariables {
+  folderId: number;
+  name: string;
+}
+
+export interface RenameFileMutationVariables {
+  fileId: number;
+  name: string;
+}

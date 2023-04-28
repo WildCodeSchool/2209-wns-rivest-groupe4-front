@@ -50,3 +50,65 @@ export const GET_PROJECTS = gql`
     }
   }
 `;
+
+export const GET_CHOSEN_PROJECT = gql`
+  query GetOneProject($id: Float!) {
+    getOneProject(id: $id) {
+      id
+      description
+      createdAt
+      name
+      isPublic
+      updatedAt
+    }
+    getAllFoldersByProjectId(idProject: $id) {
+      name
+      id
+      parentFolder {
+        name
+        id
+      }
+      files {
+        id
+        content
+        extension
+        name
+      }
+    }
+  }
+`;
+
+export const GET_SHARED_PROJECTS = gql`
+  query GetSharedProjects(
+    $offset: Float!
+    $limit: Float!
+    $order: String
+    $orderBy: String
+  ) {
+    getSharedProjects(
+      offset: $offset
+      limit: $limit
+      order: $order
+      orderBy: $orderBy
+    ) {
+      id
+      name
+      description
+      likes {
+        user {
+          id
+        }
+      }
+      comments {
+        id
+      }
+      reports {
+        id
+      }
+      user {
+        pseudo
+      }
+      createdAt
+    }
+  }
+`;
