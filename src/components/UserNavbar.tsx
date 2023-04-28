@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useContext } from "react";
 import { NavLink } from "react-router-dom";
 import AuthContext from "../contexts/AuthContext";
-import { UserContext } from "../contexts/UserContext";
+import useLoggedUser from "../hooks/useLoggedUser";
 
 interface INavbarProps {
   opened: boolean;
@@ -9,7 +9,7 @@ interface INavbarProps {
 }
 
 function UserNavbar({ opened, setOpened }: INavbarProps) {
-  const { user } = useContext(UserContext);
+  const { user } = useLoggedUser();
   const { signOut } = useContext(AuthContext);
 
   return (
