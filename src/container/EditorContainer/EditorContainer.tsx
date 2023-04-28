@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { NetworkStatus, useMutation, useQuery } from "@apollo/client";
 import { Breadcrumb, Button, Spinner } from "flowbite-react";
 import { useState } from "react";
 
@@ -15,49 +15,8 @@ import InputEditor from "../../components/InputEditor/InputEditor";
 import ReturnEditor from "../../components/ReturnEditor";
 import IFile from "../../interfaces/IFile";
 import { ExistingProjectQueryResult } from "./types";
-
-export const GET_CHOSEN_PROJECT = gql`
-  query GetOneProject($id: Float!) {
-    getOneProject(id: $id) {
-      id
-      description
-      createdAt
-      name
-      isPublic
-      updatedAt
-    }
-    getAllFoldersByProjectId(idProject: $id) {
-      name
-      id
-      parentFolder {
-        name
-        id
-      }
-      files {
-        id
-        content
-        extension
-        name
-      }
-    }
-  }
-`;
-
-const SAVE_PROJECT = gql`
-  mutation ModifyFile(
-    $idFile: Float!
-    $fileName: String
-    $fileContent: String
-    $fileExtension: String
-  ) {
-    modifyFile(
-      idFile: $idFile
-      name: $fileName
-      content: $fileContent
-      extension: $fileExtension
-    )
-  }
-`;
+import { SAVE_PROJECT } from "../../apollo/mutations";
+import { GET_CHOSEN_PROJECT } from "../../apollo/queries";
 
 function EditorContainer() {
   document.title = "Codeless4 | Editor";
@@ -88,7 +47,7 @@ function EditorContainer() {
     },
   });
 
-  const { loading } = useQuery(GET_CHOSEN_PROJECT, {
+  const { loading, networkStatus, refetch } = useQuery(GET_CHOSEN_PROJECT, {
     variables: { id: Number(idProject) },
     onCompleted: (data) => {
       setCurrentProject(data);
@@ -117,7 +76,7 @@ function EditorContainer() {
     saveFile();
   };
 
-  if (loading) return <Spinner />;
+  if (loading || networkStatus === NetworkStatus.refetch) return <Spinner />;
 
   return (
     <div className="flex flex-row h-full">
@@ -125,6 +84,7 @@ function EditorContainer() {
         <EditorAside
           setCurrentFile={setCurrentFile}
           projectData={currentProject}
+          refetch={refetch}
         />
       )}
       <div className="h-full w-full flex flex-col">
@@ -195,9 +155,12 @@ function EditorContainer() {
               )}
             </button>
           </div>
-          {isOpen && (
+          {isOpen && currentFile && (
             <div className="h-full w-full">
-              <ReturnEditor codeToQuery={codeToRun} />
+              <ReturnEditor
+                codeToQuery={codeToRun}
+                fileExtension={currentFile.extension}
+              />
             </div>
           )}
         </div>

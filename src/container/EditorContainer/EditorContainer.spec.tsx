@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { MockedProvider, MockedResponse } from "@apollo/client/testing";
 
-import EditorContainer, { GET_CHOSEN_PROJECT } from "./EditorContainer";
+import EditorContainer from "./EditorContainer";
+import { GET_CHOSEN_PROJECT } from "../../apollo/queries";
 
 const mocks: Array<MockedResponse> = [
   { request: { query: GET_CHOSEN_PROJECT }, result: { data: {} } },

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ToggleSwitch } from "flowbite-react";
 import { gql, useMutation } from "@apollo/client";
-// import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { ChatBubbleLeftIcon, HeartIcon } from "@heroicons/react/20/solid";
 import IProjectsListing from "../interfaces/IProjectsListing";
 import DeleteProjectModal from "./Modals/DeleteProjectModal";
