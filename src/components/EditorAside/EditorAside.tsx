@@ -128,18 +128,6 @@ function FolderTree({
         setShowAddFolderModal(null);
         refetch();
       },
-      // optimisticResponse: {
-      //   __typename: "Mutation",
-      //   addFolder: {
-      //     __typename: "Folder",
-      //     id: -1,
-      //     name,
-      //     parentFolder: {
-      //       __typename: "Folder",
-      //       id: parseInt(folderId, 10),
-      //     },
-      //   },
-      // },
     });
   };
 
@@ -236,23 +224,36 @@ function FolderTree({
             onMouseLeave={() => handleFolderHover("")}
           >
             <div
-              className="relative"
+              className="relative flex"
               onClick={() => {
                 toggleFolder(folder.id);
                 handleCollapsable(folder.id);
               }}
             >
-              {folder.name}
+              <span>{folder.name}</span>
               {isCollapsed === folder.id ? (
-                <span
-                  className="absolute rotate-90 p-1"
-                  style={{ fontWeight: "200" }}
-                >
-                  &gt;
+                <span className="rotate-90 p-1" style={{ fontWeight: "200" }}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+                  </svg>
                 </span>
               ) : (
                 <span className="p-1" style={{ fontWeight: "200" }}>
-                  &gt;
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    viewBox="0 0 16 16"
+                  >
+                    <path d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+                  </svg>
                 </span>
               )}
             </div>
