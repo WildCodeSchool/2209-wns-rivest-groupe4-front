@@ -50,3 +50,38 @@ export const GET_PROJECTS = gql`
     }
   }
 `;
+
+export const GET_SHARED_PROJECTS = gql`
+  query GetSharedProjects(
+    $offset: Float!
+    $limit: Float!
+    $order: String
+    $orderBy: String
+  ) {
+    getSharedProjects(
+      offset: $offset
+      limit: $limit
+      order: $order
+      orderBy: $orderBy
+    ) {
+      id
+      name
+      description
+      likes {
+        user {
+          id
+        }
+      }
+      comments {
+        id
+      }
+      reports {
+        id
+      }
+      user {
+        pseudo
+      }
+      createdAt
+    }
+  }
+`;
