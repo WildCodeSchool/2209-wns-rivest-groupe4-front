@@ -74,6 +74,8 @@ export const GET_CHOSEN_PROJECT = gql`
         extension
         name
       }
+    }
+  }
 `;
 
 export const GET_SHARED_PROJECTS = gql`
