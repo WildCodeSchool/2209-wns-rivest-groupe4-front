@@ -157,7 +157,10 @@ function EditorContainer() {
           </div>
           {isOpen && (
             <div className="h-full w-full">
-              <ReturnEditor codeToQuery={codeToRun} />
+              <ReturnEditor
+                codeToQuery={codeToRun}
+                fileExtension={currentFile?.extension}
+              />
             </div>
           )}
         </div>
