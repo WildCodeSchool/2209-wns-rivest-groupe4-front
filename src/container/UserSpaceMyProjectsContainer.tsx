@@ -20,7 +20,7 @@ function UserSpaceMyProjectsContainer() {
     <div className="flex flex-col gap-3">
       <div className="px-4 sm:px-0">
         <h3 className="font-aldrich text-2xl leading-6 ">My projects</h3>
-      </div>{" "}
+      </div>
       {userProjects?.map((project) => (
         <MyProjectCard key={project.id} project={project} />
       ))}
