@@ -8,7 +8,7 @@ type FormValues = {
   reason: string;
 };
 
-const SEND_MAIL = gql`
+export const SEND_MAIL = gql`
   query Query($name: String!, $email: String!, $reason: String!) {
     SendMail(name: $name, email: $email, reason: $reason)
   }
@@ -85,7 +85,7 @@ function ContactScreen() {
               <p className="text-red-600 mt-1">Reason is required</p>
             )}
             <div className="flex justify-center mt-4">
-              <Button type="submit" value="send">
+              <Button role="button" type="submit" value="send">
                 SEND
               </Button>
             </div>
