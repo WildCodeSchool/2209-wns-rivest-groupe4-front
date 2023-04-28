@@ -16,6 +16,7 @@ import RedirectScreen from "./screens/RedirectScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import SharesScreen from "./screens/SharesScreen";
 import UserSpaceScreen from "./screens/UserSpaceScreen";
+import useLoggedUser from "./hooks/useLoggedUser";
 
 export type ReducerState = {
   isLoading: boolean;
@@ -66,7 +67,7 @@ const reducer = (prevState: ReducerState, action: ReducerAction) => {
 function App() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [authState, dispatch] = useReducer(reducer, initialState);
-
+  const { user } = useLoggedUser();
   useEffect(() => {
     const userTokenStorage = localStorage.getItem("token");
 
@@ -104,16 +105,29 @@ function App() {
           <Route path="/" element={<HomeScreen />} />
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/register" element={<RegisterScreen />} />
-          <Route path="/editor/:idProject" element={<EditorScreen />} />
+          <Route
+            path="/editor/:idProject"
+            element={user.id === undefined ? <LoginScreen /> : <EditorScreen />}
+          />
 
           <Route
             path="/project-details/:idProject"
             element={<ProjectDetailsScreen />}
           />
-          <Route path="/choose" element={<ChooseProjectScreen />} />
+          <Route
+            path="/choose"
+            element={
+              user.id === undefined ? <LoginScreen /> : <ChooseProjectScreen />
+            }
+          />
           <Route path="/contact" element={<ContactScreen />} />
           <Route path="/shares" element={<SharesScreen />} />
-          <Route path="/user-space" element={<UserSpaceScreen />} />
+          <Route
+            path="/user-space"
+            element={
+              user.id === undefined ? <LoginScreen /> : <UserSpaceScreen />
+            }
+          />
           <Route path="/premium" element={<PremiumScreen />} />
           <Route path="/redirect" element={<RedirectScreen />} />
           <Route
