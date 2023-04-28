@@ -155,11 +155,11 @@ function EditorContainer() {
               )}
             </button>
           </div>
-          {isOpen && (
+          {isOpen && currentFile && (
             <div className="h-full w-full">
               <ReturnEditor
                 codeToQuery={codeToRun}
-                fileExtension={currentFile?.extension}
+                fileExtension={currentFile.extension}
               />
             </div>
           )}

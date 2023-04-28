@@ -32,7 +32,7 @@ function AddFileModal({
             setNewFileName(e.target.value)
           }
         />
-        <div className="grid place-items-center">
+        <div className="grid mt-4 place-items-center">
           <Button
             onClick={() => {
               if (showAddFileModal) {

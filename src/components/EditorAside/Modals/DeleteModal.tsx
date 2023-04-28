@@ -30,7 +30,7 @@ function DeleteModal({
     >
       <Modal.Header>Supprimer</Modal.Header>
       <Modal.Body>
-        <div className="flex justify-between">
+        <div className="flex mt-4 justify-between">
           <Button onClick={handleDeletion}>Confirmer</Button>
           <Button onClick={() => setShowDeleteModal(null)}>Annuler</Button>
         </div>

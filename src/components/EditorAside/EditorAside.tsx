@@ -185,6 +185,7 @@ function FolderTree({
         name,
       },
       onCompleted() {
+        setShowRenameModal(null);
         refetch();
       },
     });
@@ -197,6 +198,7 @@ function FolderTree({
         name,
       },
       onCompleted() {
+        setShowRenameModal(null);
         refetch();
       },
     });
@@ -213,7 +215,7 @@ function FolderTree({
   return (
     <>
       {tree.map((folder) => (
-        <div className="ml-4 cursor-pointer" key={folder.id}>
+        <div className="ml-4 cursor-pointer" key={folder.id + folder.name}>
           <div
             className={`${
               menuVisibility.folder === folder.id && "bg-sky-500/[.06]"
