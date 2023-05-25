@@ -7,6 +7,7 @@ export default interface IFolderTree {
   };
   children?: IFolderTree[];
   files?: Array<{
+    id: string;
     content: string;
     extension: string;
     name: string;

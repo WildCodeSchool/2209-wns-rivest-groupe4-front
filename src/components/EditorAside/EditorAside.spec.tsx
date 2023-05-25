@@ -137,6 +137,7 @@ const MOCK_PROJECT: ExistingProjectQueryResult = {
       ],
       files: [
         {
+          id: "1",
           content: "File 1 content",
           extension: "js",
           name: "File 1",

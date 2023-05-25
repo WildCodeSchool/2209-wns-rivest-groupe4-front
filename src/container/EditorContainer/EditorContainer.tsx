@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { NetworkStatus, useMutation, useQuery } from "@apollo/client";
 import { Breadcrumb, Button, Spinner } from "flowbite-react";
 import { useState } from "react";
@@ -17,6 +18,7 @@ import IFile from "../../interfaces/IFile";
 import { ExistingProjectQueryResult } from "./types";
 import { SAVE_PROJECT } from "../../apollo/mutations";
 import { GET_CHOSEN_PROJECT } from "../../apollo/queries";
+import fileHooks from "../../hooks/fileHooks";
 
 function EditorContainer() {
   document.title = "Codeless4 | Editor";
@@ -126,7 +128,11 @@ function EditorContainer() {
         <div className="flex flex-row h-full w-full">
           <div className="h-full w-full relative">
             <InputEditor
-              editorValue={currentFile ? currentFile.content : ""}
+              editorValue={
+                currentFile
+                  ? currentFile.content
+                  : fileHooks.findFirstFile(currentProject!)
+              }
               setEditorValue={(e) => {
                 if (currentFile) {
                   setCurrentFile({
@@ -158,7 +164,10 @@ function EditorContainer() {
           {isOpen && currentFile && (
             <div className="h-full w-full">
               <ReturnEditor
-                codeToQuery={codeToRun}
+                codeToQuery={fileHooks.getImportedFiles(
+                  codeToRun,
+                  currentProject!,
+                )}
                 fileExtension={currentFile.extension}
               />
             </div>
