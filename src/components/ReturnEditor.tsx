@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AceEditor from "react-ace";
 import axios from "axios";
+import fileHooks from "../hooks/fileHooks";
 
 interface Props {
   codeToQuery: string;
@@ -15,21 +16,25 @@ function ReturnEditor({ codeToQuery, fileExtension }: Props) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [returnedValue, setReturnedValue] = useState<string>("");
 
-  axios({
-    method: "post",
-    url: "http://localhost:7008/compiler/file",
-    data: {
-      code: btoa(codeToQuery).toString(),
-      fileExtension,
-    },
-  })
-    .then((response) => {
-      setReturnedValue(response.data);
+  useEffect(() => {
+    axios({
+      method: "post",
+      url: "http://localhost:7008/compiler/file",
+      data: {
+        code: btoa(codeToQuery).toString(),
+        fileExtension,
+      },
     })
-    .catch((error) => {
-      setReturnedValue(error);
-    })
-    .finally(() => setIsLoading(false));
+      .then((response) => {
+        if (response.data) {
+          setReturnedValue(response.data);
+        }
+      })
+      .catch((error) => {
+        setReturnedValue(fileHooks.formatFileError(error.response.data));
+      })
+      .finally(() => setIsLoading(false));
+  }, [codeToQuery, fileExtension]);
 
   return (
     <AceEditor
