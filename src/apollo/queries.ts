@@ -106,6 +106,7 @@ export const GET_SHARED_PROJECTS = gql`
         id
       }
       user {
+        id
         pseudo
       }
       createdAt
