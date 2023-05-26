@@ -27,7 +27,7 @@ function ReturnEditor({ codeToQuery, fileExtension }: Props) {
     })
       .then((response) => {
         if (response.data) {
-          setReturnedValue(response.data);
+          setReturnedValue(JSON.stringify(response.data));
         }
       })
       .catch((error) => {
