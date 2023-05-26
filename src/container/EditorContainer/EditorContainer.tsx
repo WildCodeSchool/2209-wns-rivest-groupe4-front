@@ -19,6 +19,7 @@ import { ExistingProjectQueryResult } from "./types";
 import { SAVE_PROJECT } from "../../apollo/mutations";
 import { GET_CHOSEN_PROJECT } from "../../apollo/queries";
 import fileHooks from "../../hooks/fileHooks";
+import useEventListener from "../../hooks/useEventListener";
 
 function EditorContainer() {
   document.title = "Codeless4 | Editor";
@@ -56,12 +57,21 @@ function EditorContainer() {
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSave = () => {
     if (currentFile) {
       saveFile();
     }
   };
+
+  const handleKeyboardSave = (event: KeyboardEvent) => {
+    const { key, ctrlKey } = event;
+    if (ctrlKey && key === "s") {
+      event.preventDefault();
+      handleSave();
+    }
+  };
+
+  useEventListener("keydown", handleKeyboardSave);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleShare = () => {

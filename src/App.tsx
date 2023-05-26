@@ -31,7 +31,7 @@ type ReducerAction = {
 
 const initialState: ReducerState = {
   isLoading: true,
-  isSignout: false,
+  isSignout: true,
   userToken: null,
 };
 
