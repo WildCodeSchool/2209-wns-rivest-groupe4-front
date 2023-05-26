@@ -67,7 +67,7 @@ const reducer = (prevState: ReducerState, action: ReducerAction) => {
 function App() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [authState, dispatch] = useReducer(reducer, initialState);
-  const { user } = useLoggedUser();
+  const { user, refetch } = useLoggedUser();
   useEffect(() => {
     const userTokenStorage = localStorage.getItem("token");
 
@@ -81,6 +81,7 @@ function App() {
       signIn: (data: ITokenWithUserValues) => {
         localStorage.setItem("token", data.token);
         dispatch({ type: "SIGN_IN", token: data.token });
+        refetch();
       },
       signOut: () => {
         localStorage.removeItem("token");
@@ -88,14 +89,16 @@ function App() {
           type: "SIGN_OUT",
           token: null,
         });
+        refetch();
       },
       signUp: (data: ITokenWithUserValues) => {
         localStorage.setItem("token", data.token);
         dispatch({ type: "SIGN_IN", token: data.token });
+        refetch();
       },
       authState,
     }),
-    [authState],
+    [authState, refetch],
   );
   return (
     <AuthContext.Provider value={authContext}>
