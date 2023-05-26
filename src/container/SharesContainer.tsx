@@ -47,7 +47,7 @@ function SharesContainer() {
   return (
     <>
       <BestSharesHeader handleOrderBy={handleOrderBy} filters={filters} />
-      <div className="flex flex-col h-full gap-6 mx-32 my-10">
+      <div className="flex flex-col items-center h-full gap-6 mx-32 my-10">
         {data.getSharedProjects.map((project: IBestSharesProject) => (
           <ProjectsListing key={project.id} project={project} />
         ))}
