@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import NavbarContainer from "./container/NavbarContainer";
 import AuthContext from "./contexts/AuthContext";
@@ -17,6 +17,8 @@ import RegisterScreen from "./screens/RegisterScreen";
 import SharesScreen from "./screens/SharesScreen";
 import UserSpaceScreen from "./screens/UserSpaceScreen";
 import useLoggedUser from "./hooks/useLoggedUser";
+import AlertContext, { AlertState, AlertType } from "./contexts/AlertContext";
+import Alert from "./components/Modals/Alert";
 
 export type ReducerState = {
   isLoading: boolean;
@@ -76,6 +78,11 @@ function App() {
     }
   }, []);
 
+  const [alertState, setAlertState] = useState<AlertState>({
+    show: false,
+    message: "",
+    type: "info",
+  });
   const authContext = useMemo(
     () => ({
       signIn: (data: ITokenWithUserValues) => {
@@ -100,45 +107,75 @@ function App() {
     }),
     [authState, refetch],
   );
+  const alertContext = useMemo(
+    () => ({
+      showAlert: (message: string, type: AlertType) => {
+        setAlertState({
+          show: true,
+          message,
+          type,
+        });
+      },
+      hideAlert: () => {
+        setAlertState({
+          show: false,
+          message: "",
+          type: "info",
+        });
+      },
+      alertState,
+    }),
+    [alertState],
+  );
+
   return (
     <AuthContext.Provider value={authContext}>
-      <main className="flex flex-col w-full h-screen relative">
-        <NavbarContainer />
-        <Routes>
-          <Route path="/" element={<HomeScreen />} />
-          <Route path="/login" element={<LoginScreen />} />
-          <Route path="/register" element={<RegisterScreen />} />
-          <Route
-            path="/editor/:idProject"
-            element={user.id === undefined ? <LoginScreen /> : <EditorScreen />}
-          />
+      <AlertContext.Provider value={alertContext}>
+        <main className="flex flex-col w-full relative">
+          <NavbarContainer />
+          <Routes>
+            <Route path="/" element={<HomeScreen />} />
+            <Route path="/login" element={<LoginScreen />} />
+            <Route path="/register" element={<RegisterScreen />} />
+            <Route
+              path="/editor/:idProject"
+              element={
+                user.id === undefined ? <LoginScreen /> : <EditorScreen />
+              }
+            />
 
-          <Route
-            path="/project-details/:idProject"
-            element={<ProjectDetailsScreen />}
-          />
-          <Route
-            path="/choose"
-            element={
-              user.id === undefined ? <LoginScreen /> : <ChooseProjectScreen />
-            }
-          />
-          <Route path="/contact" element={<ContactScreen />} />
-          <Route path="/shares" element={<SharesScreen />} />
-          <Route
-            path="/user-space"
-            element={
-              user.id === undefined ? <LoginScreen /> : <UserSpaceScreen />
-            }
-          />
-          <Route path="/premium" element={<PremiumScreen />} />
-          <Route path="/redirect" element={<RedirectScreen />} />
-          <Route
-            path="/mobile-code-editor"
-            element={<MobileCodeEditorScreen />}
-          />
-        </Routes>
-      </main>
+            <Route
+              path="/project-details/:idProject"
+              element={<ProjectDetailsScreen />}
+            />
+            <Route
+              path="/choose"
+              element={
+                user.id === undefined ? (
+                  <LoginScreen />
+                ) : (
+                  <ChooseProjectScreen />
+                )
+              }
+            />
+            <Route path="/contact" element={<ContactScreen />} />
+            <Route path="/shares" element={<SharesScreen />} />
+            <Route
+              path="/user-space"
+              element={
+                user.id === undefined ? <LoginScreen /> : <UserSpaceScreen />
+              }
+            />
+            <Route path="/premium" element={<PremiumScreen />} />
+            <Route path="/redirect" element={<RedirectScreen />} />
+            <Route
+              path="/mobile-code-editor"
+              element={<MobileCodeEditorScreen />}
+            />
+          </Routes>
+          <Alert />
+        </main>
+      </AlertContext.Provider>
     </AuthContext.Provider>
   );
 }

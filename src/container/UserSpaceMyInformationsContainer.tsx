@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Button, Spinner } from "flowbite-react";
 import { useMutation } from "@apollo/client";
 import { MODIFY_USER } from "../apollo/mutations";
 import useLoggedUser from "../hooks/useLoggedUser";
+import AlertContext from "../contexts/AlertContext";
 
 function UserSpaceMyInformationsContainer() {
   const { user, refetch } = useLoggedUser();
+  const { showAlert } = useContext(AlertContext);
 
   const [userUpdates, setUserUpdates] = useState<{
     email?: string;
@@ -17,7 +19,13 @@ function UserSpaceMyInformationsContainer() {
   });
 
   const [modifyUser, { loading }] = useMutation(MODIFY_USER, {
-    onCompleted: refetch,
+    onError: (error) => {
+      showAlert(error.message, "error");
+    },
+    onCompleted: async () => {
+      await refetch();
+      showAlert("Informations updated", "success");
+    },
   });
 
   const handleClickModify = async () => {

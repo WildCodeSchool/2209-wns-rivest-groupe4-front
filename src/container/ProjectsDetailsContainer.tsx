@@ -1,10 +1,11 @@
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Button } from "flowbite-react";
 import { useNavigate, useParams } from "react-router-dom";
 import IProjectsListing from "../interfaces/IProjectsListing";
 import IFolder from "../interfaces/IFolder";
 import IComment from "../interfaces/IComment";
+import AlertContext from "../contexts/AlertContext";
 
 const GET_PROJECT_BY_ID = gql`
   query GetOneProject($getOneProjectId: Float!) {
@@ -126,6 +127,8 @@ function ProjectDetailsContainer() {
   const [comments, setComments] = useState<IComment[]>();
   const [userComment, setUserComment] = useState("");
   const [userCommentModify, setUserCommentModify] = useState("");
+
+  const { showAlert } = useContext(AlertContext);
 
   const [addLike] = useMutation(ADD_LIKE, {
     onCompleted() {
@@ -303,7 +306,7 @@ function ProjectDetailsContainer() {
         setLikesCount(likesCount + 1);
       }
     } else {
-      alert("This is your project, you can't add like on it"); // eslint-disable-line no-alert
+      showAlert("This is your project, you can't add like on it", "info");
     }
   };
 

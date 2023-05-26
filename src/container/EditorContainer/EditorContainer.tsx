@@ -91,7 +91,7 @@ function EditorContainer() {
   if (loading || networkStatus === NetworkStatus.refetch) return <Spinner />;
 
   return (
-    <div className="flex flex-row h-full">
+    <div className="flex flex-row h-screen">
       {currentProject && (
         <EditorAside
           setCurrentFile={setCurrentFile}
