@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ToggleSwitch } from "flowbite-react";
 import { gql, useMutation } from "@apollo/client";
@@ -6,6 +6,7 @@ import { ChatBubbleLeftIcon, HeartIcon } from "@heroicons/react/20/solid";
 import IProjectsListing from "../interfaces/IProjectsListing";
 import DeleteProjectModal from "./Modals/DeleteProjectModal";
 import UpdateProjectModal from "./Modals/UpdateProjectModal";
+import AlertContext from "../contexts/AlertContext";
 
 type Props = {
   project: IProjectsListing;
@@ -23,18 +24,21 @@ const UPDATE_PUBLIC_STATE = gql`
 function MyProjectCard({ project }: Props) {
   const { id, comments, name, description, likes, isPublic } = project;
 
+  const { showAlert } = useContext(AlertContext);
+
   const [isPublicLocal, setIsPublicLocal] = useState(isPublic);
-  const [modifyPublicState] = useMutation(UPDATE_PUBLIC_STATE);
 
-  useEffect(() => {
-    (async () => {
-      await modifyPublicState({
-        variables: { modifyProjectId: Number(id), isPublic: isPublicLocal },
-      });
-    })();
-  }, [id, isPublicLocal, modifyPublicState]);
-
-  // TODO modal update name and description
+  const [modifyPublicState] = useMutation(UPDATE_PUBLIC_STATE, {
+    onCompleted: () => {
+      showAlert("Project visibility updated", "success");
+    },
+  });
+  const handleIsPublicChange = async () => {
+    await modifyPublicState({
+      variables: { modifyProjectId: Number(id), isPublic: !isPublicLocal },
+    });
+    setIsPublicLocal(!isPublicLocal);
+  };
 
   return (
     <div className="relative bg-gray-900 min-h-60">
@@ -58,7 +62,7 @@ function MyProjectCard({ project }: Props) {
             <ToggleSwitch
               checked={isPublicLocal}
               label="Public"
-              onChange={() => setIsPublicLocal(!isPublicLocal)}
+              onChange={handleIsPublicChange}
             />
             <div className="flex gap-0.5 items-center">
               <span>{likes.length}</span>

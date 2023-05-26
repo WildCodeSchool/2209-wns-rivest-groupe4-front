@@ -1,11 +1,12 @@
 import { gql, useMutation } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { ChatBubbleLeftIcon, HeartIcon } from "@heroicons/react/20/solid";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import IUser from "../interfaces/IUser";
 import ILike from "../interfaces/ILike";
 import IComment from "../interfaces/IComment";
 import useLoggedUser from "../hooks/useLoggedUser";
+import AlertContext from "../contexts/AlertContext";
 
 // TODO delete this const
 const post = {
@@ -63,6 +64,8 @@ function ProjectsListing({ project }: ProjectsListingProps) {
   const { user: loggedUser } = useLoggedUser();
   const { id, description, user, likes, comments, createdAt } = project;
 
+  const { showAlert } = useContext(AlertContext);
+
   const datetime = new Date(createdAt);
   const date = datetime.toLocaleDateString("en-US", {
     month: "short",
@@ -93,27 +96,38 @@ function ProjectsListing({ project }: ProjectsListingProps) {
   });
 
   const handleLike = () => {
-    if (loggedUser.id === undefined) return;
-    if (!isLikedByLoggedUser) {
-      addLike();
-      setCounter({ ...counter, likes: counter.likes + 1 });
+    if (loggedUser.id === undefined) {
+      showAlert(
+        "Please login or register to interract with projects :)",
+        "warning",
+      );
+    } else if (project.user.id === loggedUser.id) {
+      showAlert("You can't like your own project :)", "warning");
     } else {
-      deleteLike();
-      setCounter({ ...counter, likes: counter.likes - 1 });
+      if (!isLikedByLoggedUser) {
+        addLike();
+        setCounter({ ...counter, likes: counter.likes + 1 });
+      } else {
+        deleteLike();
+        setCounter({ ...counter, likes: counter.likes - 1 });
+      }
+      setIsLikedByLoggedUser(!isLikedByLoggedUser);
     }
-    setIsLikedByLoggedUser(!isLikedByLoggedUser);
   };
 
   const handleClickComment = (idClicked: number) => {
-    if (loggedUser.id !== undefined) {
-      navigate(`/project-details/${idClicked}`);
+    if (loggedUser.id === undefined) {
+      showAlert(
+        "Please login or register to interract with projects :)",
+        "info",
+      );
     } else {
-      alert("Please login or register to interract with projects :)"); // eslint-disable-line no-alert
+      navigate(`/project-details/${idClicked}`);
     }
   };
 
   return (
-    <div className="bg-white py-6 sm:py-8">
+    <div className="bg-slate-100 py-6 sm:py-8 w-2/3 rounded-2xl">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:max-w-4xl">
           <div className="mt-8 space-y-20 lg:space-y-20">
