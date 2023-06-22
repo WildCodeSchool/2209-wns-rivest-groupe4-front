@@ -116,32 +116,29 @@ const findFirstFile = (project: ExistingProjectQueryResult): string => {
 };
 
 const createZip = async (
-  folders: IFolderTree[],
+  allFolders: IFolderTree[],
+  currentFolder: IFolderTree,
   zip: JSZip,
-  parentFolderName = "",
+  folderPath = "",
 ): Promise<void> => {
-  for (const folder of folders) {
-    const folderName = folder.name.replace(/[\\/:*?"<>|]/g, "");
-    const folderPath = `${parentFolderName}/${folderName}`.trim();
+  const currentPath = `${
+    folderPath + currentFolder.name.replace(/[\\/:*?"<>|]/g, "")
+  }/`;
+  zip.folder(currentPath);
 
-    const folderZip = folder.parentFolder && zip.folder(folderPath);
-
-    if (folder.files) {
-      if (!folder.parentFolder) {
-        for (const file of folder.files) {
-          zip.file(`${file.name}.${file.extension}`, file.content);
-        }
-      } else {
-        for (const file of folder.files) {
-          folderZip!.file(file.name, file.content);
-        }
-      }
+  if (currentFolder.files) {
+    for (const file of currentFolder.files) {
+      zip
+        .folder(currentPath)
+        ?.file(`${file.name}.${file.extension}`, file.content);
     }
+  }
 
-    if (folder.children) {
-      // eslint-disable-next-line no-await-in-loop
-      await createZip(folder.children, folderZip!, folderPath);
-    }
+  for (const childrenFolder of allFolders.filter(
+    (el) => el.parentFolder?.id === currentFolder.id,
+  )) {
+    // eslint-disable-next-line no-await-in-loop
+    await createZip(allFolders, childrenFolder, zip, currentPath);
   }
 };
 
@@ -149,7 +146,11 @@ const saveProjectAsZip = async (
   project: ExistingProjectQueryResult,
 ): Promise<void> => {
   const zip = new JSZip();
-  await createZip(project.getAllFoldersByProjectId, zip);
+  await createZip(
+    project.getAllFoldersByProjectId,
+    project.getAllFoldersByProjectId.find((el) => el.parentFolder == null)!,
+    zip,
+  );
   const zipFile = await zip.generateAsync({ type: "blob" });
   saveAs(zipFile, project.getOneProject.name);
 };
