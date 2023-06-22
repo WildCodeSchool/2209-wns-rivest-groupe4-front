@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { Button, Modal, Spinner } from "flowbite-react";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import IProjectsListing from "../../interfaces/IProjectsListing";
+import useLoggedUser from "../../hooks/useLoggedUser";
+import { GET_PROJECTS } from "../../apollo/queries";
+import AlertContext from "../../contexts/AlertContext";
 
 type Props = {
   project: IProjectsListing;
@@ -14,7 +17,13 @@ const UPDATE_PROJECT = gql`
     $description: String
     $name: String
   ) {
-    modifyProject(id: $modifyProjectId, description: $description, name: $name)
+    modifyProject(
+      id: $modifyProjectId
+      description: $description
+      name: $name
+    ) {
+      id
+    }
   }
 `;
 
@@ -26,7 +35,23 @@ function UpdateProjectModal({ project }: Props) {
     description,
   });
 
-  const [updateProject, { loading }] = useMutation(UPDATE_PROJECT);
+  const { user } = useLoggedUser();
+  const { showAlert } = useContext(AlertContext);
+
+  const { refetch } = useQuery(GET_PROJECTS, {
+    variables: { userId: user?.id },
+  });
+
+  const [updateProject, { loading }] = useMutation(UPDATE_PROJECT, {
+    onError: (error) => {
+      showAlert(error.message, "error");
+    },
+    onCompleted: async () => {
+      await refetch();
+      setShow(false);
+      showAlert("Project updated successfully", "success");
+    },
+  });
 
   const handleSave = async () => {
     await updateProject({
@@ -35,7 +60,6 @@ function UpdateProjectModal({ project }: Props) {
         modifyProjectId: Number(id),
       },
     });
-    setShow(false);
   };
 
   return (

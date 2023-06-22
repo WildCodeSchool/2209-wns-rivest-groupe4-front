@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { NetworkStatus, useMutation, useQuery } from "@apollo/client";
 import { Breadcrumb, Button, Spinner } from "flowbite-react";
 import { useState } from "react";
@@ -17,6 +18,8 @@ import IFile from "../../interfaces/IFile";
 import { ExistingProjectQueryResult } from "./types";
 import { SAVE_PROJECT } from "../../apollo/mutations";
 import { GET_CHOSEN_PROJECT } from "../../apollo/queries";
+import fileHooks from "../../hooks/fileHooks";
+import useEventListener from "../../hooks/useEventListener";
 
 function EditorContainer() {
   document.title = "Codeless4 | Editor";
@@ -54,21 +57,29 @@ function EditorContainer() {
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSave = () => {
     if (currentFile) {
       saveFile();
     }
   };
 
+  const handleKeyboardSave = (event: KeyboardEvent) => {
+    const { key, ctrlKey } = event;
+    if (ctrlKey && key === "s") {
+      event.preventDefault();
+      handleSave();
+    }
+  };
+
+  useEventListener("keydown", handleKeyboardSave);
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleShare = () => {
     // TODO create hashed link userID and projectID
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleDownload = () => {
-    // TODO download zip with project structure
+  const handleDownload = (project: ExistingProjectQueryResult) => {
+    fileHooks.saveProjectAsZip(project);
   };
 
   const handleRun = () => {
@@ -79,7 +90,7 @@ function EditorContainer() {
   if (loading || networkStatus === NetworkStatus.refetch) return <Spinner />;
 
   return (
-    <div className="flex flex-row h-full">
+    <div className="flex flex-row h-screen">
       {currentProject && (
         <EditorAside
           setCurrentFile={setCurrentFile}
@@ -115,9 +126,14 @@ function EditorContainer() {
             <button type="button" onClick={() => handleSave()}>
               <BookmarkIcon className="h-6 w-6" />
             </button>
-            <button type="button" onClick={() => handleSave()}>
-              <ArrowDownOnSquareIcon className="h-6 w-6" />
-            </button>
+            {currentProject && (
+              <button
+                type="button"
+                onClick={() => handleDownload(currentProject)}
+              >
+                <ArrowDownOnSquareIcon className="h-6 w-6" />
+              </button>
+            )}
             <button type="button" onClick={() => handleSave()}>
               <ShareIcon className="h-6 w-6" />
             </button>
@@ -126,7 +142,11 @@ function EditorContainer() {
         <div className="flex flex-row h-full w-full">
           <div className="h-full w-full relative">
             <InputEditor
-              editorValue={currentFile ? currentFile.content : ""}
+              editorValue={
+                currentFile
+                  ? currentFile.content
+                  : fileHooks.findFirstFile(currentProject!)
+              }
               setEditorValue={(e) => {
                 if (currentFile) {
                   setCurrentFile({
@@ -158,7 +178,10 @@ function EditorContainer() {
           {isOpen && currentFile && (
             <div className="h-full w-full">
               <ReturnEditor
-                codeToQuery={codeToRun}
+                codeToQuery={fileHooks.getImportedFiles(
+                  codeToRun,
+                  currentProject!,
+                )}
                 fileExtension={currentFile.extension}
               />
             </div>
