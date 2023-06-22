@@ -1,4 +1,8 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 import { ExistingProjectQueryResult } from "../container/EditorContainer/types";
+import IFolderTree from "../interfaces/IFolderTree";
 
 const extractFileNameFromImport = (line: string) => {
   const regexWithBraces =
@@ -111,8 +115,49 @@ const findFirstFile = (project: ExistingProjectQueryResult): string => {
   return closestFile.file;
 };
 
+const createZip = async (
+  allFolders: IFolderTree[],
+  currentFolder: IFolderTree,
+  zip: JSZip,
+  folderPath = "",
+): Promise<void> => {
+  const currentPath = `${
+    folderPath + currentFolder.name.replace(/[\\/:*?"<>|]/g, "")
+  }/`;
+  zip.folder(currentPath);
+
+  if (currentFolder.files) {
+    for (const file of currentFolder.files) {
+      zip
+        .folder(currentPath)
+        ?.file(`${file.name}.${file.extension}`, file.content);
+    }
+  }
+
+  for (const childrenFolder of allFolders.filter(
+    (el) => el.parentFolder?.id === currentFolder.id,
+  )) {
+    // eslint-disable-next-line no-await-in-loop
+    await createZip(allFolders, childrenFolder, zip, currentPath);
+  }
+};
+
+const saveProjectAsZip = async (
+  project: ExistingProjectQueryResult,
+): Promise<void> => {
+  const zip = new JSZip();
+  await createZip(
+    project.getAllFoldersByProjectId,
+    project.getAllFoldersByProjectId.find((el) => el.parentFolder == null)!,
+    zip,
+  );
+  const zipFile = await zip.generateAsync({ type: "blob" });
+  saveAs(zipFile, project.getOneProject.name);
+};
+
 export default {
   getImportedFiles,
   formatFileError,
   findFirstFile,
+  saveProjectAsZip,
 };
