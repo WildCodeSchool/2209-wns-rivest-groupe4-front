@@ -78,9 +78,8 @@ function EditorContainer() {
     // TODO create hashed link userID and projectID
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleDownload = () => {
-    // TODO download zip with project structure
+  const handleDownload = (project: ExistingProjectQueryResult) => {
+    fileHooks.saveProjectAsZip(project);
   };
 
   const handleRun = () => {
@@ -127,9 +126,14 @@ function EditorContainer() {
             <button type="button" onClick={() => handleSave()}>
               <BookmarkIcon className="h-6 w-6" />
             </button>
-            <button type="button" onClick={() => handleSave()}>
-              <ArrowDownOnSquareIcon className="h-6 w-6" />
-            </button>
+            {currentProject && (
+              <button
+                type="button"
+                onClick={() => handleDownload(currentProject)}
+              >
+                <ArrowDownOnSquareIcon className="h-6 w-6" />
+              </button>
+            )}
             <button type="button" onClick={() => handleSave()}>
               <ShareIcon className="h-6 w-6" />
             </button>
