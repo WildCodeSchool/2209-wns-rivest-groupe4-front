@@ -12,4 +12,5 @@ export default interface IProjectsListingProps {
   comments: IComment[];
   isUserProject?: boolean;
   isPublic: boolean;
+  createdAt: Date;
 }

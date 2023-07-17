@@ -1,8 +1,9 @@
 import React, { useContext, useState } from "react";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { Button, Modal, Spinner } from "flowbite-react";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import IProjectsListing from "../../interfaces/IProjectsListing";
+import { UPDATE_PROJECT } from "../../apollo/mutations";
 import useLoggedUser from "../../hooks/useLoggedUser";
 import { GET_PROJECTS } from "../../apollo/queries";
 import AlertContext from "../../contexts/AlertContext";
@@ -10,22 +11,6 @@ import AlertContext from "../../contexts/AlertContext";
 type Props = {
   project: IProjectsListing;
 };
-
-const UPDATE_PROJECT = gql`
-  mutation Mutation(
-    $modifyProjectId: Float!
-    $description: String
-    $name: String
-  ) {
-    modifyProject(
-      id: $modifyProjectId
-      description: $description
-      name: $name
-    ) {
-      id
-    }
-  }
-`;
 
 function UpdateProjectModal({ project }: Props) {
   const { id, name, description } = project;
