@@ -11,7 +11,6 @@ interface INavbarProps {
 function UserNavbar({ opened, setOpened }: INavbarProps) {
   const { user } = useLoggedUser();
   const { signOut, authState } = useContext(AuthContext);
-
   return (
     <div>
       {opened ? (
@@ -23,7 +22,7 @@ function UserNavbar({ opened, setOpened }: INavbarProps) {
             onClick={() => setOpened(!opened)}
             onKeyDown={() => setOpened(!opened)}
           >
-            <img className="w-8 h-8" src="assets/user.svg" alt="user" />
+            <img className="w-8 h-8" src="/assets/user.svg" alt="user" />
             <ul className="absolute flex flex-col justify-center items-center border-b-2 border-l-2 border-t-2 border-white bg-[#11172a] h-fit w-52 top-20 right-0 z-30">
               <NavLink
                 to="/login"

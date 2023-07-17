@@ -18,6 +18,7 @@ export const GET_ONE_USER = gql`
     getOneUser(id: $getOneUserId) {
       email
       dailyRuns
+      hashedPassword
       premium
       pseudo
     }
@@ -51,6 +52,77 @@ export const GET_PROJECTS = gql`
   }
 `;
 
+export const GET_PROJECTS_SUPPORTED = gql`
+  query Query($userId: String!) {
+    getProjectsSupported(userId: $userId) {
+      comments {
+        id
+      }
+      createdAt
+      description
+      updatedAt
+      name
+      isPublic
+      id
+      likes {
+        user {
+          id
+          pseudo
+        }
+      }
+      user {
+        id
+        pseudo
+      }
+    }
+  }
+`;
+
+export const GET_PROJECT_BY_ID = gql`
+  query GetOneProject($getOneProjectId: Float!) {
+    getOneProject(id: $getOneProjectId) {
+      comments {
+        comment
+        createdAt
+        updatedAt
+        user {
+          pseudo
+        }
+      }
+      createdAt
+      description
+      likes {
+        user {
+          pseudo
+          id
+        }
+      }
+      name
+      updatedAt
+      user {
+        id
+        pseudo
+      }
+    }
+  }
+`;
+
+export const GET_COMMENTS_BY_IDPROJECT = gql`
+  query GetAllCommentsByProjectId($getAllCommentsByProjectIdIdProject: Float!) {
+    getAllCommentsByProjectId(idProject: $getAllCommentsByProjectIdIdProject) {
+      id
+      comment
+      createdAt
+      updatedAt
+      user {
+        id
+        pseudo
+        premium
+      }
+    }
+  }
+`;
+
 export const GET_CHOSEN_PROJECT = gql`
   query GetOneProject($id: Float!) {
     getOneProject(id: $id) {
@@ -74,6 +146,45 @@ export const GET_CHOSEN_PROJECT = gql`
         extension
         name
       }
+    }
+  }
+`;
+
+export const GET_FOLDER_BY_IDPROJECT = gql`
+  query GetAllFoldersByProjectId($idProject: Float!) {
+    getAllFoldersByProjectId(idProject: $idProject) {
+      id
+      name
+      files {
+        id
+        content
+        extension
+        name
+      }
+      parentFolder {
+        id
+      }
+    }
+  }
+`;
+export const GET_DAILY_RUNS = gql`
+  query getDailyRunsUser {
+    getDailyRunsUser
+  }
+`;
+
+export const GET_USER_LIKES = gql`
+  query getMonthlyLikesByUser {
+    getMonthlyLikesByUser {
+      id
+    }
+  }
+`;
+
+export const GET_USER_COMMENTS = gql`
+  query getMonthlyCommentsByUser {
+    getMonthlyCommentsByUser {
+      id
     }
   }
 `;
@@ -110,6 +221,21 @@ export const GET_SHARED_PROJECTS = gql`
         pseudo
       }
       createdAt
+    }
+  }
+`;
+
+export const GET_TOKEN_WITH_USER = gql`
+  query Query($password: String!, $email: String!) {
+    getTokenWithUser(password: $password, email: $email) {
+      user {
+        dailyRuns
+        email
+        id
+        premium
+        pseudo
+      }
+      token
     }
   }
 `;
