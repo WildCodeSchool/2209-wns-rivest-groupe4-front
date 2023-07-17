@@ -9,6 +9,7 @@ import { GET_TOKEN_WITH_USER } from "../apollo/queries";
 import AuthContext from "../contexts/AuthContext";
 import ILoginFormValues from "../interfaces/ILoginFormValues";
 import ITokenWithUserValues from "../interfaces/ITokenWithUser";
+import AlertContext from "../contexts/AlertContext";
 
 /* --------------------FORM VALIDATION-------------------- */
 const schema = yup
@@ -26,11 +27,12 @@ const schema = yup
 
 function LoginContainer() {
   document.title = "Codeless4 | Login";
+  const { showAlert } = useContext(AlertContext);
 
   const navigate = useNavigate();
 
   const { signIn } = useContext(AuthContext);
-  const [login, { error }] = useLazyQuery(GET_TOKEN_WITH_USER, {
+  const [login, { error: queryError }] = useLazyQuery(GET_TOKEN_WITH_USER, {
     onCompleted(data: { getTokenWithUser: ITokenWithUserValues }) {
       signIn(data.getTokenWithUser);
       navigate(-1);
@@ -50,6 +52,10 @@ function LoginContainer() {
       variables: data,
     });
   };
+
+  if (queryError) {
+    showAlert(queryError.message, "error");
+  }
 
   return (
     <form
@@ -94,7 +100,7 @@ function LoginContainer() {
             </span>
           )}
         </label>
-        {error?.message === "Invalid Auth" && (
+        {queryError?.message === "Invalid Auth" && (
           <span className="text-sm text-red-600">Invalid Credentials</span>
         )}
         <Link to="/login" className="text-sm block underline">
