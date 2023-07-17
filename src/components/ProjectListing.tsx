@@ -1,7 +1,9 @@
-import { gql, useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { ChatBubbleLeftIcon, HeartIcon } from "@heroicons/react/20/solid";
 import { useContext, useState } from "react";
+import { ADD_LIKE, DELETE_LIKE } from "../apollo/mutations";
+import { GET_PROJECTS_SUPPORTED, GET_USER_LIKES } from "../apollo/queries";
 import IUser from "../interfaces/IUser";
 import ILike from "../interfaces/ILike";
 import IComment from "../interfaces/IComment";
@@ -33,17 +35,6 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-const ADD_LIKE = gql`
-  mutation Mutation($idProject: Float!) {
-    addLike(idProject: $idProject)
-  }
-`;
-
-const DELETE_LIKE = gql`
-  mutation DeleteLike($idProject: Float!) {
-    deleteLike(idProject: $idProject)
-  }
-`;
 export interface IBestSharesProject {
   id: number;
   name: string;
@@ -63,6 +54,20 @@ interface ProjectsListingProps {
 function ProjectsListing({ project }: ProjectsListingProps) {
   const { user: loggedUser } = useLoggedUser();
   const { id, description, user, likes, comments, createdAt } = project;
+  const [userLikes, setUserLikes] = useState<number>(0);
+
+  const { refetch: refreshLikes } = useQuery(GET_USER_LIKES, {
+    onCompleted(data: { getMonthlyLikesByUser: ILike[] }) {
+      setUserLikes(data.getMonthlyLikesByUser.length);
+    },
+  });
+
+  const { refetch: refreshProjectsSupported } = useQuery(
+    GET_PROJECTS_SUPPORTED,
+    {
+      variables: { userId: loggedUser?.id },
+    },
+  );
 
   const { showAlert } = useContext(AlertContext);
 
@@ -87,11 +92,19 @@ function ProjectsListing({ project }: ProjectsListingProps) {
     variables: {
       idProject: Number(id),
     },
+    onCompleted: async () => {
+      await refreshLikes();
+      await refreshProjectsSupported();
+    },
   });
 
   const [deleteLike] = useMutation(DELETE_LIKE, {
     variables: {
       idProject: Number(id),
+    },
+    onCompleted: async () => {
+      await refreshLikes();
+      await refreshProjectsSupported();
     },
   });
 
@@ -105,7 +118,14 @@ function ProjectsListing({ project }: ProjectsListingProps) {
       showAlert("You can't like your own project :)", "warning");
     } else {
       if (!isLikedByLoggedUser) {
-        addLike();
+        if (userLikes < 5) {
+          addLike();
+        } else {
+          showAlert(
+            "You can't like more than 5 projects per month :)",
+            "warning",
+          );
+        }
         setCounter({ ...counter, likes: counter.likes + 1 });
       } else {
         deleteLike();
