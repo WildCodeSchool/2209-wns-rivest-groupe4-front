@@ -1,8 +1,9 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { ToggleSwitch } from "flowbite-react";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { ChatBubbleLeftIcon, HeartIcon } from "@heroicons/react/20/solid";
+import { UPDATE_PUBLIC_STATE } from "../apollo/mutations";
 import IProjectsListing from "../interfaces/IProjectsListing";
 import DeleteProjectModal from "./Modals/DeleteProjectModal";
 import UpdateProjectModal from "./Modals/UpdateProjectModal";
@@ -11,15 +12,6 @@ import AlertContext from "../contexts/AlertContext";
 type Props = {
   project: IProjectsListing;
 };
-
-const UPDATE_PUBLIC_STATE = gql`
-  mutation Mutation($modifyProjectId: Float!, $isPublic: Boolean) {
-    modifyProject(id: $modifyProjectId, isPublic: $isPublic) {
-      id
-      isPublic
-    }
-  }
-`;
 
 function MyProjectCard({ project }: Props) {
   const { id, comments, name, description, likes, isPublic } = project;

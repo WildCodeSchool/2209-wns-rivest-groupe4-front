@@ -1,10 +1,30 @@
 import { gql } from "@apollo/client";
 
-// USER MUTATIONS
+// USER MUTATION
+export const CREATE_USER = gql`
+  mutation Mutation($pseudo: String!, $password: String!, $email: String!) {
+    createUser(pseudo: $pseudo, password: $password, email: $email) {
+      token
+      user {
+        id
+      }
+    }
+  }
+`;
 export const MODIFY_USER = gql`
   mutation ModifyUser($pseudo: String, $password: String, $email: String) {
     modifyUser(pseudo: $pseudo, password: $password, email: $email) {
       token
+    }
+  }
+`;
+
+export const ADD_RUN = gql`
+  mutation Mutation {
+    addRun {
+      id
+      dayOfRun
+      dailyRuns
     }
   }
 `;
@@ -96,6 +116,76 @@ export const RENAME_FILE = gql`
     modifyFile(name: $name, idFile: $idFile) {
       id
       name
+    }
+  }
+`;
+
+export const ADD_LIKE = gql`
+  mutation Mutation($idProject: Float!) {
+    addLike(idProject: $idProject) {
+      id
+    }
+  }
+`;
+
+export const DELETE_LIKE = gql`
+  mutation DeleteLike($idProject: Float!) {
+    deleteLike(idProject: $idProject)
+  }
+`;
+
+export const UPDATE_PUBLIC_STATE = gql`
+  mutation Mutation($modifyProjectId: Float!, $isPublic: Boolean) {
+    modifyProject(id: $modifyProjectId, isPublic: $isPublic) {
+      id
+      isPublic
+    }
+  }
+`;
+
+export const UPDATE_PROJECT = gql`
+  mutation Mutation(
+    $modifyProjectId: Float!
+    $description: String
+    $name: String
+  ) {
+    modifyProject(
+      id: $modifyProjectId
+      description: $description
+      name: $name
+    ) {
+      id
+    }
+  }
+`;
+
+export const DELETE_COMMENT = gql`
+  mutation Mutation($idComment: Float!) {
+    deleteComment(idComment: $idComment)
+  }
+`;
+
+export const MODIFY_COMMENT = gql`
+  mutation Mutation($content: String!, $modifyCommentId: Float!) {
+    modifyComment(content: $content, id: $modifyCommentId)
+  }
+`;
+
+export const ADD_COMMENT = gql`
+  mutation Mutation($idProject: Float!, $comment: String!) {
+    addComment(idProject: $idProject, comment: $comment) {
+      comment
+      createdAt
+      id
+      updatedAt
+      user {
+        premium
+        id
+        pseudo
+      }
+      project {
+        id
+      }
     }
   }
 `;

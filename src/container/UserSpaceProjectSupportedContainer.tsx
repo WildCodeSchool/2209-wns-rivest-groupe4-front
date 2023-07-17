@@ -1,39 +1,17 @@
 import React, { useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { NavLink } from "react-router-dom";
 import { Button } from "flowbite-react";
 import IProjectsListing from "../interfaces/IProjectsListing";
-import useLoggedUser from "../hooks/useLoggedUser";
+import { GET_PROJECTS_SUPPORTED } from "../apollo/queries";
+import IUser from "../interfaces/IUser";
+import ProjectsListing from "../components/ProjectListing";
 
-const GET_PROJECTS_SUPPORTED = gql`
-  query Query($userId: String!) {
-    getProjectsSupported(userId: $userId) {
-      comments {
-        id
-      }
-      createdAt
-      description
-      updatedAt
-      name
-      isPublic
-      id
-      likes {
-        user {
-          id
-          pseudo
-        }
-      }
-      user {
-        id
-        pseudo
-      }
-    }
-  }
-`;
+interface IUserInformationsProps {
+  user: IUser;
+}
 
-function UserSpaceProjectSupportedContainer() {
-  const { user } = useLoggedUser();
-
+function UserSpaceProjectSupportedContainer({ user }: IUserInformationsProps) {
   const [supportedProjects, setSupportedProject] =
     useState<IProjectsListing[]>();
 
@@ -49,18 +27,7 @@ function UserSpaceProjectSupportedContainer() {
       <h1 className="font-aldrich text-3xl">Projects supported :</h1>
       {supportedProjects && supportedProjects?.length > 0 ? (
         supportedProjects.map((el) => (
-          <p key="key">{el.id}</p>
-          // <ProjectsListing
-          //   id={el.id}
-          //   comments={el.comments}
-          //   description={el.description}
-          //   likes={el.likes}
-          //   name={el.name}
-          //   updatedAt={el.updatedAt}
-          //   isPublic={el.isPublic}
-          //   user={el.user}
-          //   key={el.id}
-          // />
+          <ProjectsListing key={el.id} project={el} />
         ))
       ) : (
         <div className="my-32 flex flex-col justify-center items-center gap-4">

@@ -1,28 +1,14 @@
-import { gql, useLazyQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button } from "flowbite-react";
 import { useContext } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import * as yup from "yup";
+import { GET_TOKEN_WITH_USER } from "../apollo/queries";
 import AuthContext from "../contexts/AuthContext";
 import ILoginFormValues from "../interfaces/ILoginFormValues";
 import ITokenWithUserValues from "../interfaces/ITokenWithUser";
-
-const GET_TOKEN_WITH_USER = gql`
-  query Query($password: String!, $email: String!) {
-    getTokenWithUser(password: $password, email: $email) {
-      user {
-        dailyRuns
-        email
-        id
-        premium
-        pseudo
-      }
-      token
-    }
-  }
-`;
 
 /* --------------------FORM VALIDATION-------------------- */
 const schema = yup

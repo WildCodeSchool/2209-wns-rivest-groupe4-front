@@ -3,22 +3,11 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Button } from "flowbite-react";
-
 import { NavLink, useNavigate } from "react-router-dom";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import ITokenWithUserValues from "../interfaces/ITokenWithUser";
-import AlertContext from "../contexts/AlertContext";
+import { CREATE_USER } from "../apollo/mutations";
 
-const CREATE_USER = gql`
-  mutation Mutation($pseudo: String!, $password: String!, $email: String!) {
-    createUser(pseudo: $pseudo, password: $password, email: $email) {
-      token
-      user {
-        id
-      }
-    }
-  }
-`;
 
 interface IRegisterFormValues {
   email: string;
