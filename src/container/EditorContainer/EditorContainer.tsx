@@ -141,23 +141,25 @@ function EditorContainer() {
         </div>
         <div className="flex flex-row h-full w-full">
           <div className="h-full w-full relative">
-            <InputEditor
-              editorValue={
-                currentFile
-                  ? currentFile.content
-                  : fileHooks.findFirstFile(currentProject!)
-              }
-              setEditorValue={(e) => {
-                if (currentFile) {
-                  setCurrentFile({
-                    id: currentFile.id,
-                    name: currentFile.name,
-                    extension: currentFile.extension,
-                    content: e,
-                  });
+            {currentProject && (
+              <InputEditor
+                editorValue={
+                  currentFile
+                    ? currentFile.content
+                    : fileHooks.findFirstFile(currentProject!)
                 }
-              }}
-            />
+                setEditorValue={(e) => {
+                  if (currentFile) {
+                    setCurrentFile({
+                      id: currentFile.id,
+                      name: currentFile.name,
+                      extension: currentFile.extension,
+                      content: e,
+                    });
+                  }
+                }}
+              />
+            )}
             <button
               type="button"
               style={{
