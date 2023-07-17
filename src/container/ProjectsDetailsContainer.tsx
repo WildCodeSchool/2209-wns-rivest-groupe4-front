@@ -1,4 +1,4 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { useContext, useState } from "react";
 import { Button } from "flowbite-react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -6,112 +6,23 @@ import IProjectsListing from "../interfaces/IProjectsListing";
 import IFolder from "../interfaces/IFolder";
 import IComment from "../interfaces/IComment";
 import AlertContext from "../contexts/AlertContext";
-
-const GET_PROJECT_BY_ID = gql`
-  query GetOneProject($getOneProjectId: Float!) {
-    getOneProject(id: $getOneProjectId) {
-      comments {
-        comment
-        createdAt
-        updatedAt
-        user {
-          pseudo
-        }
-      }
-      createdAt
-      description
-      likes {
-        user {
-          pseudo
-          id
-        }
-      }
-      name
-      updatedAt
-      user {
-        id
-        pseudo
-      }
-    }
-  }
-`;
-
-const GET_FOLDER_BY_IDPROJECT = gql`
-  query GetAllFoldersByProjectId($idProject: Float!) {
-    getAllFoldersByProjectId(idProject: $idProject) {
-      id
-      name
-      files {
-        id
-        content
-        extension
-        name
-      }
-      parentFolder {
-        id
-      }
-    }
-  }
-`;
-
-const GET_COMMENTS_BY_IDPROJECT = gql`
-  query GetAllCommentsByProjectId($getAllCommentsByProjectIdIdProject: Float!) {
-    getAllCommentsByProjectId(idProject: $getAllCommentsByProjectIdIdProject) {
-      id
-      comment
-      createdAt
-      updatedAt
-      user {
-        id
-        pseudo
-        premium
-      }
-    }
-  }
-`;
-
-const DELETE_COMMENT = gql`
-  mutation Mutation($idComment: Float!) {
-    deleteComment(idComment: $idComment)
-  }
-`;
-
-const MODIFY_COMMENT = gql`
-  mutation Mutation($content: String!, $modifyCommentId: Float!) {
-    modifyComment(content: $content, id: $modifyCommentId)
-  }
-`;
-
-const ADD_COMMENT = gql`
-  mutation Mutation($idProject: Float!, $comment: String!) {
-    addComment(idProject: $idProject, comment: $comment) {
-      comment
-      createdAt
-      id
-      updatedAt
-      user {
-        premium
-        id
-        pseudo
-      }
-      project {
-        id
-      }
-    }
-  }
-`;
-
-const ADD_LIKE = gql`
-  mutation Mutation($idProject: Float!) {
-    addLike(idProject: $idProject)
-  }
-`;
-
-const DELETE_LIKE = gql`
-  mutation DeleteLike($idProject: Float!) {
-    deleteLike(idProject: $idProject)
-  }
-`;
+import {
+  ADD_LIKE,
+  DELETE_LIKE,
+  ADD_COMMENT,
+  MODIFY_COMMENT,
+  DELETE_COMMENT,
+} from "../apollo/mutations";
+import {
+  GET_PROJECT_BY_ID,
+  GET_FOLDER_BY_IDPROJECT,
+  GET_COMMENTS_BY_IDPROJECT,
+  GET_USER_LIKES,
+  GET_USER_COMMENTS,
+  GET_PROJECTS_SUPPORTED,
+} from "../apollo/queries";
+import useLoggedUser from "../hooks/useLoggedUser";
+import ILike from "../interfaces/ILike";
 
 function ProjectDetailsContainer() {
   document.title = "Codeless4 | Details";
@@ -127,23 +38,48 @@ function ProjectDetailsContainer() {
   const [comments, setComments] = useState<IComment[]>();
   const [userComment, setUserComment] = useState("");
   const [userCommentModify, setUserCommentModify] = useState("");
+  const [countUserLikes, setCountUserLikes] = useState<number>(0);
+  const [countUserComments, setCountUserComments] = useState<number>(0);
 
   const { showAlert } = useContext(AlertContext);
+  const { user, refetch } = useLoggedUser();
+
+  const { refetch: refreshLikes } = useQuery(GET_USER_LIKES, {
+    onCompleted(data: { getMonthlyLikesByUser: ILike[] }) {
+      setCountUserLikes(data.getMonthlyLikesByUser.length);
+    },
+  });
+
+  const { refetch: refreshComments } = useQuery(GET_USER_COMMENTS, {
+    onCompleted(data: { getMonthlyCommentsByUser: Comment[] }) {
+      setCountUserComments(data.getMonthlyCommentsByUser.length);
+    },
+  });
+
+  const { refetch: refreshProjects } = useQuery(GET_PROJECTS_SUPPORTED, {
+    variables: { userId: user?.id },
+  });
 
   const [addLike] = useMutation(ADD_LIKE, {
-    onCompleted() {
+    onCompleted: async () => {
       setIsLiked(true);
+      refetch();
+      await refreshLikes();
+      await refreshProjects();
     },
   });
 
   const [deleteLike] = useMutation(DELETE_LIKE, {
-    onCompleted() {
+    onCompleted: async () => {
       setIsLiked(false);
+      refetch();
+      await refreshLikes();
+      await refreshProjects();
     },
   });
 
   const [addCommentary] = useMutation(ADD_COMMENT, {
-    onCompleted(data: { addComment: IComment }) {
+    onCompleted: async (data: { addComment: IComment }) => {
       const newComment: IComment = {
         id: data.addComment?.id,
         comment: data.addComment?.comment,
@@ -158,6 +94,9 @@ function ProjectDetailsContainer() {
         setComments([newComment]);
       }
       setUserComment("");
+      refetch();
+      await refreshComments();
+      await refreshProjects();
     },
   });
 
@@ -183,7 +122,11 @@ function ProjectDetailsContainer() {
     },
   });
 
-  const [deleteComment] = useMutation(DELETE_COMMENT);
+  const [deleteComment] = useMutation(DELETE_COMMENT, {
+    onCompleted: async () => {
+      await refreshComments();
+    },
+  });
 
   useQuery(GET_COMMENTS_BY_IDPROJECT, {
     variables: { getAllCommentsByProjectIdIdProject: Number(idProject) },
@@ -231,12 +174,16 @@ function ProjectDetailsContainer() {
   };
 
   const postComment = () => {
-    addCommentary({
-      variables: {
-        idProject: Number(idProject),
-        comment: userComment,
-      },
-    });
+    if (user?.premium || countUserComments < 5) {
+      addCommentary({
+        variables: {
+          idProject: Number(idProject),
+          comment: userComment,
+        },
+      });
+    } else {
+      showAlert("You can't comment more than 5 projects per month", "warning");
+    }
   };
 
   const dateFormat = (date: Date): string => {
@@ -296,7 +243,7 @@ function ProjectDetailsContainer() {
         });
         setIsLiked(false);
         setLikesCount(likesCount - 1);
-      } else {
+      } else if (user?.premium || countUserLikes < 5) {
         addLike({
           variables: {
             idProject: Number(idProject),
@@ -304,6 +251,8 @@ function ProjectDetailsContainer() {
         });
         setIsLiked(true);
         setLikesCount(likesCount + 1);
+      } else {
+        showAlert("You can't like more than 5 projects per month", "warning");
       }
     } else {
       showAlert("This is your project, you can't add like on it", "info");
@@ -332,6 +281,9 @@ function ProjectDetailsContainer() {
       deleteComment({
         variables: {
           idComment: Number(id),
+        },
+        onCompleted: () => {
+          refetch();
         },
       });
       if (comments) {
@@ -452,7 +404,7 @@ function ProjectDetailsContainer() {
         </div>
         <div className="flex flex-col justify-center items-center  w-1/2 h-64">
           <Button
-            onClick={() => navigate(`/editor?open=${idProject}`)}
+            onClick={() => navigate(`/editor/${idProject}`)}
             type="submit"
             gradientDuoTone="cyanToBlue"
             className="m-auto"
