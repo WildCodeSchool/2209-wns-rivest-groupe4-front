@@ -152,6 +152,16 @@ describe("EditorAside component", () => {
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <EditorAside
+          currentFile={
+            MOCK_PROJECT.getAllFoldersByProjectId[0].files != null
+              ? MOCK_PROJECT.getAllFoldersByProjectId[0].files[0]
+              : {
+                  id: "1",
+                  content: "File 1 content",
+                  extension: "js",
+                  name: "File 1",
+                }
+          }
           projectData={projectData}
           setCurrentFile={() => {}}
           refetch={refetch}
