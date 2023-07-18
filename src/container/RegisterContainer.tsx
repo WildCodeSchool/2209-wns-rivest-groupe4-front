@@ -7,6 +7,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 import ITokenWithUserValues from "../interfaces/ITokenWithUser";
 import { CREATE_USER } from "../apollo/mutations";
+import AlertContext from "../contexts/AlertContext";
 
 interface IRegisterFormValues {
   email: string;
