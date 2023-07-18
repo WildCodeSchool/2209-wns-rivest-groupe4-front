@@ -75,8 +75,9 @@ function App() {
 
     if (userTokenStorage) {
       dispatch({ type: "RESTORE_TOKEN", token: userTokenStorage });
+      refetch();
     }
-  }, []);
+  }, [refetch]);
 
   const [alertState, setAlertState] = useState<AlertState>({
     show: false,
@@ -96,7 +97,7 @@ function App() {
           type: "SIGN_OUT",
           token: null,
         });
-        refetch();
+        window.location.reload();
       },
       signUp: (data: ITokenWithUserValues) => {
         localStorage.setItem("token", data.token);

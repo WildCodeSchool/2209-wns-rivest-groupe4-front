@@ -8,7 +8,6 @@ import { useMutation } from "@apollo/client";
 import ITokenWithUserValues from "../interfaces/ITokenWithUser";
 import { CREATE_USER } from "../apollo/mutations";
 
-
 interface IRegisterFormValues {
   email: string;
   password: string;

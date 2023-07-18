@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { useMutation } from "@apollo/client";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   CreateFileMutationVariables,
   CreateFolderMutationVariables,
@@ -64,11 +64,10 @@ function FolderTree({
   refetch: () => void;
 }) {
   const [openFolders, setOpenFolders] = useState<string[]>([]);
-  const [isCollapsed, setIsCollapsed] = useState<string>("");
+  const [isCollapsed, setIsCollapsed] = useState<string>();
   const [menuVisibility, setMenuVisibility] = useState<MenuVisibility>({});
   const [newFolderName, setNewFolderName] = useState<string>("");
   const [newFileName, setNewFileName] = useState<string>("");
-
   // MODALS
   const [showAddFolderModal, setShowAddFolderModal] = useState<{
     parentFolder: string;
@@ -215,7 +214,13 @@ function FolderTree({
   return (
     <>
       {tree.map((folder) => (
-        <div className="ml-4 cursor-pointer" key={folder.id + folder.name}>
+        <div
+          className={`${
+            isCollapsed &&
+            "relative before:absolute before:content-[''] before:left-0 before:bottom-0 before:right-0  before:border-l-white before:border-l-2 before:w-2 before:h-[calc(100%-26px)]"
+          } ml-4 cursor-pointer`}
+          key={folder.id + folder.name}
+        >
           <div
             className={`${
               menuVisibility.folder === folder.id && "bg-sky-500/[.06]"
@@ -232,7 +237,7 @@ function FolderTree({
                 handleCollapsable(folder.id);
               }}
             >
-              <span>{folder.name}</span>
+              <span className="">{folder.name}</span>
               {isCollapsed === folder.id ? (
                 <span className="rotate-90 p-1" style={{ fontWeight: "200" }}>
                   <svg

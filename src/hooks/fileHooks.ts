@@ -3,6 +3,7 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { ExistingProjectQueryResult } from "../container/EditorContainer/types";
 import IFolderTree from "../interfaces/IFolderTree";
+import IFile from "../interfaces/IFile";
 
 const extractFileNameFromImport = (line: string) => {
   const regexWithBraces =
@@ -115,6 +116,36 @@ const findFirstFile = (project: ExistingProjectQueryResult): string => {
   return closestFile.file;
 };
 
+const getAriane = (
+  project: ExistingProjectQueryResult,
+  currentFile: IFile,
+): string[] => {
+  const foldersNames: string[] = [];
+
+  const firstParentFolder = project.getAllFoldersByProjectId.find(
+    (folder) =>
+      currentFile.id != null &&
+      folder &&
+      folder.files &&
+      folder.files?.filter((el) => el.id === currentFile.id).length > 0,
+  );
+
+  if (firstParentFolder?.name && firstParentFolder?.parentFolder != null) {
+    foldersNames.unshift(firstParentFolder?.name);
+  }
+  let currentFolder = firstParentFolder;
+  while (currentFolder?.parentFolder != null) {
+    currentFolder = project.getAllFoldersByProjectId.find(
+      // eslint-disable-next-line @typescript-eslint/no-loop-func
+      (el) => el.id === currentFolder?.parentFolder?.id,
+    );
+    if (currentFolder?.name && currentFolder?.parentFolder != null) {
+      foldersNames.unshift(currentFolder?.name);
+    }
+  }
+  foldersNames.push(`${currentFile.name}.${currentFile.extension}`);
+  return foldersNames;
+};
 const createZip = async (
   allFolders: IFolderTree[],
   currentFolder: IFolderTree,
@@ -160,4 +191,5 @@ export default {
   formatFileError,
   findFirstFile,
   saveProjectAsZip,
+  getAriane,
 };
