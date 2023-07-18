@@ -237,7 +237,7 @@ function FolderTree({
                 handleCollapsable(folder.id);
               }}
             >
-              <span className="">{folder.name}</span>
+              <span>{folder.name}</span>
               {isCollapsed === folder.id ? (
                 <span className="rotate-90 p-1" style={{ fontWeight: "200" }}>
                   <svg
