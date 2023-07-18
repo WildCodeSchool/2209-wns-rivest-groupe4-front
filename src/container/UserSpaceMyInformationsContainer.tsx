@@ -2,11 +2,18 @@ import React, { useContext, useState } from "react";
 import { Button, Spinner } from "flowbite-react";
 import { useMutation } from "@apollo/client";
 import { MODIFY_USER } from "../apollo/mutations";
-import useLoggedUser from "../hooks/useLoggedUser";
 import AlertContext from "../contexts/AlertContext";
+import IUser from "../interfaces/IUser";
 
-function UserSpaceMyInformationsContainer() {
-  const { user, refetch } = useLoggedUser();
+interface IUserInformationsProps {
+  user: IUser;
+  refetch: () => void;
+}
+
+function UserSpaceMyInformationsContainer({
+  user,
+  refetch,
+}: IUserInformationsProps) {
   const { showAlert } = useContext(AlertContext);
 
   const [userUpdates, setUserUpdates] = useState<{

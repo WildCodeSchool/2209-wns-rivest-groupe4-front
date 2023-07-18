@@ -34,7 +34,7 @@ export default function OpenProjectModal() {
           <ListGroup>
             {loading ? (
               <Spinner />
-            ) : data.getProjectsByUserId.lenght === 0 ? (
+            ) : data.getProjectsByUserId.length === 0 ? (
               <p>You don&apos;t have a project yet.</p>
             ) : (
               data.getProjectsByUserId.map(

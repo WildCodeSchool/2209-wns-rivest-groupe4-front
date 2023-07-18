@@ -1,49 +1,19 @@
-import { gql, useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { useNavigate } from "react-router-dom";
 import { ChatBubbleLeftIcon, HeartIcon } from "@heroicons/react/20/solid";
 import { useContext, useState } from "react";
+import { ADD_LIKE, DELETE_LIKE } from "../apollo/mutations";
+import { GET_PROJECTS_SUPPORTED, GET_USER_LIKES } from "../apollo/queries";
 import IUser from "../interfaces/IUser";
 import ILike from "../interfaces/ILike";
 import IComment from "../interfaces/IComment";
 import useLoggedUser from "../hooks/useLoggedUser";
 import AlertContext from "../contexts/AlertContext";
 
-// TODO delete this const
-const post = {
-  id: 1,
-  title: "Boost your conversion rate",
-  href: "#",
-  description:
-    "Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel iusto corrupti dicta laboris incididunt.",
-  imageUrl:
-    "https://images.unsplash.com/photo-1496128858413-b36217c2ce36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3603&q=80",
-  date: "Mar 16, 2020",
-  datetime: "2020-03-16",
-  category: { title: "Marketing", href: "#" },
-  author: {
-    name: "Michael Foster",
-    role: "Co-Founder / CTO",
-    href: "#",
-    imageUrl:
-      "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-  },
-};
-
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-const ADD_LIKE = gql`
-  mutation Mutation($idProject: Float!) {
-    addLike(idProject: $idProject)
-  }
-`;
-
-const DELETE_LIKE = gql`
-  mutation DeleteLike($idProject: Float!) {
-    deleteLike(idProject: $idProject)
-  }
-`;
 export interface IBestSharesProject {
   id: number;
   name: string;
@@ -63,6 +33,22 @@ interface ProjectsListingProps {
 function ProjectsListing({ project }: ProjectsListingProps) {
   const { user: loggedUser } = useLoggedUser();
   const { id, description, user, likes, comments, createdAt } = project;
+  const [userLikes, setUserLikes] = useState<number>(0);
+
+  const { refetch: refreshLikes } = useQuery(GET_USER_LIKES, {
+    skip: loggedUser?.id === undefined,
+    onCompleted(data: { getMonthlyLikesByUser: ILike[] }) {
+      setUserLikes(data.getMonthlyLikesByUser.length);
+    },
+  });
+
+  const { refetch: refreshProjectsSupported } = useQuery(
+    GET_PROJECTS_SUPPORTED,
+    {
+      variables: { userId: loggedUser?.id },
+      skip: loggedUser?.id === undefined,
+    },
+  );
 
   const { showAlert } = useContext(AlertContext);
 
@@ -87,11 +73,19 @@ function ProjectsListing({ project }: ProjectsListingProps) {
     variables: {
       idProject: Number(id),
     },
+    onCompleted: async () => {
+      await refreshLikes();
+      await refreshProjectsSupported();
+    },
   });
 
   const [deleteLike] = useMutation(DELETE_LIKE, {
     variables: {
       idProject: Number(id),
+    },
+    onCompleted: async () => {
+      await refreshLikes();
+      await refreshProjectsSupported();
     },
   });
 
@@ -105,7 +99,14 @@ function ProjectsListing({ project }: ProjectsListingProps) {
       showAlert("You can't like your own project :)", "warning");
     } else {
       if (!isLikedByLoggedUser) {
-        addLike();
+        if (userLikes < 5) {
+          addLike();
+        } else {
+          showAlert(
+            "You can't like more than 5 projects per month :)",
+            "warning",
+          );
+        }
         setCounter({ ...counter, likes: counter.likes + 1 });
       } else {
         deleteLike();
@@ -119,7 +120,7 @@ function ProjectsListing({ project }: ProjectsListingProps) {
     if (loggedUser.id === undefined) {
       showAlert(
         "Please login or register to interract with projects :)",
-        "info",
+        "warning",
       );
     } else {
       navigate(`/project-details/${idClicked}`);
@@ -137,7 +138,7 @@ function ProjectsListing({ project }: ProjectsListingProps) {
             >
               <div className="relative aspect-[16/9] sm:aspect-[2/1] lg:aspect-square lg:w-64 lg:shrink-0">
                 <img
-                  src={post.imageUrl}
+                  src="https://images.unsplash.com/photo-1496128858413-b36217c2ce36?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=3603&q=80"
                   alt=""
                   className="absolute inset-0 h-full w-full rounded-2xl bg-gray-50 object-cover"
                 />
@@ -148,12 +149,9 @@ function ProjectsListing({ project }: ProjectsListingProps) {
                   <time dateTime={String(datetime)} className="text-gray-500">
                     {date}
                   </time>
-                  <a
-                    href={post.category.href}
-                    className="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
-                  >
+                  <div className="relative z-10 rounded-full bg-yellow-300 px-3 py-1.5 font-medium text-black">
                     Javascript
-                  </a>
+                  </div>
                 </div>
                 <div className="group relative max-w-xl">
                   <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">

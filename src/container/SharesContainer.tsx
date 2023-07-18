@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Spinner } from "flowbite-react";
 import { GET_SHARED_PROJECTS } from "../apollo/queries";
 import ProjectsListing, {
