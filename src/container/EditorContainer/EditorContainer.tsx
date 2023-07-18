@@ -131,7 +131,6 @@ function EditorContainer() {
     <div className="flex flex-row h-screen">
       {currentProject && (
         <EditorAside
-          currentFile={currentFile}
           setCurrentFile={setCurrentFile}
           projectData={currentProject}
           refetch={refetch}

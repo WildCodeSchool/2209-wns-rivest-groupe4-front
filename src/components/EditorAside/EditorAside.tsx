@@ -27,7 +27,6 @@ import RenameModal from "./Modals/RenameModal";
 
 interface Props {
   projectData: ExistingProjectQueryResult;
-  currentFile: IFile;
   setCurrentFile: (file: IFile) => void;
   refetch: () => void;
 }
@@ -57,12 +56,10 @@ const createTree = (folders: IFolderTree[]) => {
 
 function FolderTree({
   tree,
-  currentFile,
   setCurrentFile,
   refetch,
 }: {
   tree: IFolderTree[];
-  currentFile: IFile;
   setCurrentFile: (file: IFile) => void;
   refetch: () => void;
 }) {
@@ -289,7 +286,6 @@ function FolderTree({
             isCollapsed === folder.id &&
             (openFolders.includes(folder.id) ? (
               <FolderTree
-                currentFile={currentFile}
                 setCurrentFile={setCurrentFile}
                 tree={folder.children}
                 refetch={refetch}
@@ -377,12 +373,7 @@ function FolderTree({
   );
 }
 
-function EditorAside({
-  projectData,
-  currentFile,
-  setCurrentFile,
-  refetch,
-}: Props) {
+function EditorAside({ projectData, setCurrentFile, refetch }: Props) {
   return (
     <aside
       className="w-[15%] bg-[#20252D] py-2"
@@ -393,7 +384,6 @@ function EditorAside({
       }}
     >
       <FolderTree
-        currentFile={currentFile}
         setCurrentFile={setCurrentFile}
         tree={createTree(projectData.getAllFoldersByProjectId)}
         refetch={refetch}
