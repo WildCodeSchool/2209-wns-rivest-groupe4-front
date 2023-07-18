@@ -19,7 +19,7 @@ const describeCardsData = [
 function HomeScreen() {
   document.title = "Codeless4 | Home";
   return (
-    <section className="flex flex-col h-fit gap-32 mx-32 my-16 desktopSmall:gap-6">
+    <section className="flex flex-col h-fit gap-16 m-16 desktopSmall:gap-6">
       <div className="flex flex-col gap-4 w-full justify-center items-center">
         <h1 className="text-center text-6xl font-aldrich">Welcome to</h1>
         <img
@@ -45,32 +45,34 @@ function HomeScreen() {
         <h2 className="text-4xl text-center underline font-aldrich">
           You said less ?
         </h2>
-        <div className="flex justify-between w-2/3 font-barlow">
+        <div className="flex flex-col lg:flex-row items-center w-full lg:w-2/3 font-barlow">
           <HomeAccountDescriptionCard
             title="Free account"
             titleColor="text-lime-700"
             contents={[
               "Access to the Code Editor (50 running a day)",
-              "You can give 5 likes and 3 commentaries a month ",
+              "You can give 5 likes and 3 commentaries a month",
               "You can contact us",
-              "You can subscribe a premium account",
+              "You can subscribe to a premium account",
             ]}
           />
-          <div className="h-full border-2 border-white w-1">&nbsp;</div>
+          <div className="h-full border-2 border-white w-0 lg:w-1 lg:border-l">
+            &nbsp;
+          </div>
           <HomeAccountDescriptionCard
             title="Premium account"
             titleColor="bg-gradient-to-r bg-clip-text text-transparent from-orange-800 via-orange-500 to-yellow-600 animate-premiumColorChanging"
             contents={[
               "Access to the Code Editor for unlimited use",
-              "Commentaries and likes unlimited",
-              "Work with your team in the same time",
-              "Share your code for the community",
+              "Commentaries and likes are unlimited",
+              "Work with your team at the same time",
+              "Share your code with the community",
               "Follow codelessers and be alerted when they post",
-              "Earn money, lots of money, because time is money, you will earn time by coding less with codeless",
+              "Earn money, lots of money, because time is money. You will save time by coding less with Codeless.",
             ]}
           />
         </div>
-        <NavLink className="mx-auto mt-8 w-1/5" to="/premium">
+        <NavLink className="mx-auto mt-8 w-2/3 lg:w-1/5" to="/premium">
           <Button
             type="submit"
             gradientDuoTone="pinkToOrange"
