@@ -3,7 +3,6 @@ import { useContext, useState } from "react";
 import { Button } from "flowbite-react";
 import { useNavigate, useParams } from "react-router-dom";
 import IProjectsListing from "../interfaces/IProjectsListing";
-import IFolder from "../interfaces/IFolder";
 import IComment from "../interfaces/IComment";
 import AlertContext from "../contexts/AlertContext";
 import {
@@ -23,14 +22,17 @@ import {
 } from "../apollo/queries";
 import useLoggedUser from "../hooks/useLoggedUser";
 import ILike from "../interfaces/ILike";
+import { ExistingProjectQueryResult } from "./EditorContainer/types";
+import fileHooks from "../hooks/fileHooks";
+import IFolderTree from "../interfaces/IFolderTree";
 
 function ProjectDetailsContainer() {
   document.title = "Codeless4 | Details";
 
   const { idProject } = useParams<string>();
   const [projectDetails, setProjectDetails] = useState<IProjectsListing>();
-  const [mainFolder, setMainFolder] = useState<IFolder>();
-  const [folders, setFolders] = useState<IFolder[]>();
+  const [mainFolder, setMainFolder] = useState<IFolderTree>();
+  const [folders, setFolders] = useState<IFolderTree[]>();
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [commentEdition, setCommentEdition] = useState<number | null>(null);
   const [likesCount, setLikesCount] = useState<number>(0);
@@ -58,6 +60,7 @@ function ProjectDetailsContainer() {
 
   const { refetch: refreshProjects } = useQuery(GET_PROJECTS_SUPPORTED, {
     variables: { userId: user?.id },
+    skip: user?.id === undefined,
   });
 
   const [addLike] = useMutation(ADD_LIKE, {
@@ -138,12 +141,12 @@ function ProjectDetailsContainer() {
 
   useQuery(GET_FOLDER_BY_IDPROJECT, {
     variables: { idProject: Number(idProject) },
-    onCompleted(data: { getAllFoldersByProjectId: IFolder[] }) {
+    onCompleted(data: { getAllFoldersByProjectId: IFolderTree[] }) {
       setFolders(
         data.getAllFoldersByProjectId
           .filter((el) => el.parentFolder != null)
           .sort((a, b) => {
-            return a.id - b.id;
+            return Number(a.id) - Number(b.id);
           }),
       );
       setMainFolder(
@@ -231,10 +234,7 @@ function ProjectDetailsContainer() {
   };
 
   const handleClickHeart = () => {
-    if (
-      projectDetails &&
-      projectDetails.user.id !== localStorage.getItem("uuid")
-    ) {
+    if (projectDetails && projectDetails.user.id !== user?.id) {
       if (isLiked) {
         deleteLike({
           variables: {
@@ -310,8 +310,12 @@ function ProjectDetailsContainer() {
     }
   };
 
+  const handleDownload = (project: ExistingProjectQueryResult) => {
+    fileHooks.saveProjectAsZip(project);
+  };
+
   const displayProjectTree = (
-    folder: IFolder[],
+    folder: IFolderTree[],
     padding: number,
     isMainFolder: boolean,
   ) => {
@@ -337,20 +341,21 @@ function ProjectDetailsContainer() {
             <div>{el.name}</div>
           </div>
           <div>
-            {el.files.map((file) => {
-              return (
-                <div key={file.name} className="flex gap-2">
-                  <span
-                    style={{
-                      paddingLeft: `${lineBreak * 40 + 40}px`,
-                    }}
-                  >
-                    ╚&gt;
-                  </span>
-                  <div>{`${file.name}.${file.extension}`}</div>
-                </div>
-              );
-            })}
+            {el.files &&
+              el.files.map((file) => {
+                return (
+                  <div key={file.name} className="flex gap-2">
+                    <span
+                      style={{
+                        paddingLeft: `${lineBreak * 40 + 40}px`,
+                      }}
+                    >
+                      ╚&gt;
+                    </span>
+                    <div>{`${file.name}.${file.extension}`}</div>
+                  </div>
+                );
+              })}
           </div>
         </div>
       );
@@ -411,7 +416,26 @@ function ProjectDetailsContainer() {
           >
             SHOW THE CODE
           </Button>
-          <Button type="submit" gradientDuoTone="cyanToBlue" className="m-auto">
+          <Button
+            type="submit"
+            gradientDuoTone="cyanToBlue"
+            className="m-auto"
+            onClick={() =>
+              projectDetails &&
+              folders &&
+              mainFolder &&
+              idProject &&
+              handleDownload({
+                getOneProject: {
+                  description: projectDetails?.description,
+                  id: idProject?.toString(),
+                  name: projectDetails?.name,
+                  public: projectDetails?.isPublic,
+                },
+                getAllFoldersByProjectId: [...folders, mainFolder],
+              })
+            }
+          >
             DOWNLOAD THE PROJECT
           </Button>
         </div>

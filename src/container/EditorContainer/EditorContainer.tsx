@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { NetworkStatus, useMutation, useQuery } from "@apollo/client";
 import { Breadcrumb, Button, Spinner } from "flowbite-react";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
   ArrowDownOnSquareIcon,
@@ -33,10 +33,16 @@ function EditorContainer() {
   const { idProject } = useParams();
 
   // State that defines the editors current value and the code to be sent as mutation input
-  const [currentFile, setCurrentFile] = useState<IFile>();
+  const [currentFile, setCurrentFile] = useState<IFile>({
+    id: "0",
+    name: "",
+    extension: "",
+    content: "",
+  });
   const [currentProject, setCurrentProject] =
     useState<ExistingProjectQueryResult | null>(null);
   const [codeToRun, setCodeToRun] = useState<string>("");
+  const [ariane, setAriane] = useState<string[]>([]);
 
   const handleEditorValidate = () => {
     if (currentFile) {
@@ -73,6 +79,12 @@ function EditorContainer() {
       );
     },
   });
+
+  useEffect(() => {
+    if (currentProject !== null && currentFile) {
+      setAriane(fileHooks.getAriane(currentProject, currentFile));
+    }
+  }, [currentFile, currentProject]);
 
   const handleSave = () => {
     if (currentFile) {
@@ -115,11 +127,11 @@ function EditorContainer() {
   };
 
   if (loading || networkStatus === NetworkStatus.refetch) return <Spinner />;
-
   return (
     <div className="flex flex-row h-screen">
       {currentProject && (
         <EditorAside
+          currentFile={currentFile}
           setCurrentFile={setCurrentFile}
           projectData={currentProject}
           refetch={refetch}
@@ -127,17 +139,29 @@ function EditorContainer() {
       )}
       <div className="h-full w-full flex flex-col">
         <div className="flex items-center justify-between bg-[#1b1b1b] px-4">
-          <Breadcrumb aria-label="file-breadcrumb" className="py-3">
-            <Breadcrumb.Item>
+          <Breadcrumb aria-label="file-breadcrumb" className="py-3 w-40">
+            <Breadcrumb.Item className="min-w-fit">
               {currentProject?.getOneProject.name
                 ? currentProject?.getOneProject.name
                 : "Project"}
             </Breadcrumb.Item>
-            <Breadcrumb.Item>
-              {currentFile
-                ? `${currentFile.name}.${currentFile.extension}`
-                : ""}
-            </Breadcrumb.Item>
+            {ariane.map((el, index) =>
+              ariane.length > 3 ? (
+                index < ariane.length - 2 ? (
+                  <Breadcrumb.Item className="min-w-fit" key={el}>
+                    ...
+                  </Breadcrumb.Item>
+                ) : (
+                  <Breadcrumb.Item className="min-w-fit" key={el}>
+                    {el}
+                  </Breadcrumb.Item>
+                )
+              ) : (
+                <Breadcrumb.Item className="min-w-fit" key={el}>
+                  {el}
+                </Breadcrumb.Item>
+              ),
+            )}
           </Breadcrumb>
           <Button
             onClick={() => {

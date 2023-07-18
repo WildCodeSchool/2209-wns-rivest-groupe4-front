@@ -4,7 +4,11 @@ import { Button } from "flowbite-react";
 import { useQuery } from "@apollo/client";
 import IUser from "../interfaces/IUser";
 import ILike from "../interfaces/ILike";
-import { GET_USER_LIKES, GET_USER_COMMENTS } from "../apollo/queries";
+import {
+  GET_USER_LIKES,
+  GET_USER_COMMENTS,
+  GET_DAILY_RUNS,
+} from "../apollo/queries";
 
 const graduationColor = [
   { min: 0, max: 20, color: " from-green-800 via-green-600 to-green-400" },
@@ -19,7 +23,7 @@ interface IUserInformationsProps {
 }
 
 function UserSpaceMyAccountAccessContainer({ user }: IUserInformationsProps) {
-  const [dailyRuns] = useState<number>(user.dailyRuns);
+  const [dailyRuns, setDailyRuns] = useState<number>(0);
   const [likes, setLikes] = useState<number>(0);
   const [comments, setComments] = useState<number>(0);
 
@@ -28,6 +32,12 @@ function UserSpaceMyAccountAccessContainer({ user }: IUserInformationsProps) {
   useQuery(GET_USER_LIKES, {
     onCompleted(data: { getMonthlyLikesByUser: ILike[] }) {
       setLikes(data.getMonthlyLikesByUser.length);
+    },
+  });
+
+  useQuery(GET_DAILY_RUNS, {
+    onCompleted(data: { getDailyRunsUser: number }) {
+      setDailyRuns(data.getDailyRunsUser);
     },
   });
 

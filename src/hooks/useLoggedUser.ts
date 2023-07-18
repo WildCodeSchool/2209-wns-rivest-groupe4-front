@@ -10,7 +10,9 @@ interface Result {
 }
 
 export default function useLoggedUser(): Result {
-  const { loading, error, data, refetch } = useQuery(GET_LOGGED_USER);
+  const { loading, error, data, refetch } = useQuery(GET_LOGGED_USER, {
+    skip: localStorage.getItem("token") === null,
+  });
 
   const user = {
     id: data?.getLoggedUser.id,

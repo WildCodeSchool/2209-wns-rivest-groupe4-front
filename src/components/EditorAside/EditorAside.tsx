@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 import { useMutation } from "@apollo/client";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   CreateFileMutationVariables,
   CreateFolderMutationVariables,
@@ -27,6 +27,7 @@ import RenameModal from "./Modals/RenameModal";
 
 interface Props {
   projectData: ExistingProjectQueryResult;
+  currentFile: IFile;
   setCurrentFile: (file: IFile) => void;
   refetch: () => void;
 }
@@ -56,19 +57,20 @@ const createTree = (folders: IFolderTree[]) => {
 
 function FolderTree({
   tree,
+  currentFile,
   setCurrentFile,
   refetch,
 }: {
   tree: IFolderTree[];
+  currentFile: IFile;
   setCurrentFile: (file: IFile) => void;
   refetch: () => void;
 }) {
   const [openFolders, setOpenFolders] = useState<string[]>([]);
-  const [isCollapsed, setIsCollapsed] = useState<string>("");
+  const [isCollapsed, setIsCollapsed] = useState<string>();
   const [menuVisibility, setMenuVisibility] = useState<MenuVisibility>({});
   const [newFolderName, setNewFolderName] = useState<string>("");
   const [newFileName, setNewFileName] = useState<string>("");
-
   // MODALS
   const [showAddFolderModal, setShowAddFolderModal] = useState<{
     parentFolder: string;
@@ -215,7 +217,13 @@ function FolderTree({
   return (
     <>
       {tree.map((folder) => (
-        <div className="ml-4 cursor-pointer" key={folder.id + folder.name}>
+        <div
+          className={`${
+            isCollapsed &&
+            "relative before:absolute before:content-[''] before:left-0 before:bottom-0 before:right-0  before:border-l-white before:border-l-2 before:w-2 before:h-[calc(100%-26px)]"
+          } ml-4 cursor-pointer`}
+          key={folder.id + folder.name}
+        >
           <div
             className={`${
               menuVisibility.folder === folder.id && "bg-sky-500/[.06]"
@@ -232,7 +240,7 @@ function FolderTree({
                 handleCollapsable(folder.id);
               }}
             >
-              <span>{folder.name}</span>
+              <span className="">{folder.name}</span>
               {isCollapsed === folder.id ? (
                 <span className="rotate-90 p-1" style={{ fontWeight: "200" }}>
                   <svg
@@ -281,6 +289,7 @@ function FolderTree({
             isCollapsed === folder.id &&
             (openFolders.includes(folder.id) ? (
               <FolderTree
+                currentFile={currentFile}
                 setCurrentFile={setCurrentFile}
                 tree={folder.children}
                 refetch={refetch}
@@ -368,7 +377,12 @@ function FolderTree({
   );
 }
 
-function EditorAside({ projectData, setCurrentFile, refetch }: Props) {
+function EditorAside({
+  projectData,
+  currentFile,
+  setCurrentFile,
+  refetch,
+}: Props) {
   return (
     <aside
       className="w-[15%] bg-[#20252D] py-2"
@@ -379,6 +393,7 @@ function EditorAside({ projectData, setCurrentFile, refetch }: Props) {
       }}
     >
       <FolderTree
+        currentFile={currentFile}
         setCurrentFile={setCurrentFile}
         tree={createTree(projectData.getAllFoldersByProjectId)}
         refetch={refetch}
