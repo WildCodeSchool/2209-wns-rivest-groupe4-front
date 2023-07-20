@@ -1,124 +1,38 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
-import { useState } from "react";
+import { useMutation, useQuery } from "@apollo/client";
+import { useContext, useState } from "react";
 import { Button } from "flowbite-react";
 import { useNavigate, useParams } from "react-router-dom";
 import IProjectsListing from "../interfaces/IProjectsListing";
-import IFolder from "../interfaces/IFolder";
 import IComment from "../interfaces/IComment";
-
-const GET_PROJECT_BY_ID = gql`
-  query GetOneProject($getOneProjectId: Float!) {
-    getOneProject(id: $getOneProjectId) {
-      comments {
-        comment
-        createdAt
-        updatedAt
-        user {
-          pseudo
-        }
-      }
-      createdAt
-      description
-      likes {
-        user {
-          pseudo
-          id
-        }
-      }
-      name
-      updatedAt
-      user {
-        id
-        pseudo
-      }
-    }
-  }
-`;
-
-const GET_FOLDER_BY_IDPROJECT = gql`
-  query GetAllFoldersByProjectId($idProject: Float!) {
-    getAllFoldersByProjectId(idProject: $idProject) {
-      id
-      name
-      files {
-        id
-        content
-        extension
-        name
-      }
-      parentFolder {
-        id
-      }
-    }
-  }
-`;
-
-const GET_COMMENTS_BY_IDPROJECT = gql`
-  query GetAllCommentsByProjectId($getAllCommentsByProjectIdIdProject: Float!) {
-    getAllCommentsByProjectId(idProject: $getAllCommentsByProjectIdIdProject) {
-      id
-      comment
-      createdAt
-      updatedAt
-      user {
-        id
-        pseudo
-        premium
-      }
-    }
-  }
-`;
-
-const DELETE_COMMENT = gql`
-  mutation Mutation($idComment: Float!) {
-    deleteComment(idComment: $idComment)
-  }
-`;
-
-const MODIFY_COMMENT = gql`
-  mutation Mutation($content: String!, $modifyCommentId: Float!) {
-    modifyComment(content: $content, id: $modifyCommentId)
-  }
-`;
-
-const ADD_COMMENT = gql`
-  mutation Mutation($idProject: Float!, $comment: String!) {
-    addComment(idProject: $idProject, comment: $comment) {
-      comment
-      createdAt
-      id
-      updatedAt
-      user {
-        premium
-        id
-        pseudo
-      }
-      project {
-        id
-      }
-    }
-  }
-`;
-
-const ADD_LIKE = gql`
-  mutation Mutation($idProject: Float!) {
-    addLike(idProject: $idProject)
-  }
-`;
-
-const DELETE_LIKE = gql`
-  mutation DeleteLike($idProject: Float!) {
-    deleteLike(idProject: $idProject)
-  }
-`;
+import AlertContext from "../contexts/AlertContext";
+import {
+  ADD_LIKE,
+  DELETE_LIKE,
+  ADD_COMMENT,
+  MODIFY_COMMENT,
+  DELETE_COMMENT,
+} from "../apollo/mutations";
+import {
+  GET_PROJECT_BY_ID,
+  GET_FOLDER_BY_IDPROJECT,
+  GET_COMMENTS_BY_IDPROJECT,
+  GET_USER_LIKES,
+  GET_USER_COMMENTS,
+  GET_PROJECTS_SUPPORTED,
+} from "../apollo/queries";
+import useLoggedUser from "../hooks/useLoggedUser";
+import ILike from "../interfaces/ILike";
+import { ExistingProjectQueryResult } from "./EditorContainer/types";
+import fileHooks from "../hooks/fileHooks";
+import IFolderTree from "../interfaces/IFolderTree";
 
 function ProjectDetailsContainer() {
   document.title = "Codeless4 | Details";
 
   const { idProject } = useParams<string>();
   const [projectDetails, setProjectDetails] = useState<IProjectsListing>();
-  const [mainFolder, setMainFolder] = useState<IFolder>();
-  const [folders, setFolders] = useState<IFolder[]>();
+  const [mainFolder, setMainFolder] = useState<IFolderTree>();
+  const [folders, setFolders] = useState<IFolderTree[]>();
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [commentEdition, setCommentEdition] = useState<number | null>(null);
   const [likesCount, setLikesCount] = useState<number>(0);
@@ -126,21 +40,49 @@ function ProjectDetailsContainer() {
   const [comments, setComments] = useState<IComment[]>();
   const [userComment, setUserComment] = useState("");
   const [userCommentModify, setUserCommentModify] = useState("");
+  const [countUserLikes, setCountUserLikes] = useState<number>(0);
+  const [countUserComments, setCountUserComments] = useState<number>(0);
+
+  const { showAlert } = useContext(AlertContext);
+  const { user, refetch } = useLoggedUser();
+
+  const { refetch: refreshLikes } = useQuery(GET_USER_LIKES, {
+    onCompleted(data: { getMonthlyLikesByUser: ILike[] }) {
+      setCountUserLikes(data.getMonthlyLikesByUser.length);
+    },
+  });
+
+  const { refetch: refreshComments } = useQuery(GET_USER_COMMENTS, {
+    onCompleted(data: { getMonthlyCommentsByUser: Comment[] }) {
+      setCountUserComments(data.getMonthlyCommentsByUser.length);
+    },
+  });
+
+  const { refetch: refreshProjects } = useQuery(GET_PROJECTS_SUPPORTED, {
+    variables: { userId: user?.id },
+    skip: user?.id === undefined,
+  });
 
   const [addLike] = useMutation(ADD_LIKE, {
-    onCompleted() {
+    onCompleted: async () => {
       setIsLiked(true);
+      refetch();
+      await refreshLikes();
+      await refreshProjects();
     },
   });
 
   const [deleteLike] = useMutation(DELETE_LIKE, {
-    onCompleted() {
+    onCompleted: async () => {
       setIsLiked(false);
+      refetch();
+      await refreshLikes();
+      await refreshProjects();
     },
   });
 
   const [addCommentary] = useMutation(ADD_COMMENT, {
-    onCompleted(data: { addComment: IComment }) {
+    onCompleted: async (data: { addComment: IComment }) => {
       const newComment: IComment = {
         id: data.addComment?.id,
         comment: data.addComment?.comment,
@@ -155,6 +97,9 @@ function ProjectDetailsContainer() {
         setComments([newComment]);
       }
       setUserComment("");
+      refetch();
+      await refreshComments();
+      await refreshProjects();
     },
   });
 
@@ -180,7 +125,11 @@ function ProjectDetailsContainer() {
     },
   });
 
-  const [deleteComment] = useMutation(DELETE_COMMENT);
+  const [deleteComment] = useMutation(DELETE_COMMENT, {
+    onCompleted: async () => {
+      await refreshComments();
+    },
+  });
 
   useQuery(GET_COMMENTS_BY_IDPROJECT, {
     variables: { getAllCommentsByProjectIdIdProject: Number(idProject) },
@@ -192,12 +141,12 @@ function ProjectDetailsContainer() {
 
   useQuery(GET_FOLDER_BY_IDPROJECT, {
     variables: { idProject: Number(idProject) },
-    onCompleted(data: { getAllFoldersByProjectId: IFolder[] }) {
+    onCompleted(data: { getAllFoldersByProjectId: IFolderTree[] }) {
       setFolders(
         data.getAllFoldersByProjectId
           .filter((el) => el.parentFolder != null)
           .sort((a, b) => {
-            return a.id - b.id;
+            return Number(a.id) - Number(b.id);
           }),
       );
       setMainFolder(
@@ -228,12 +177,16 @@ function ProjectDetailsContainer() {
   };
 
   const postComment = () => {
-    addCommentary({
-      variables: {
-        idProject: Number(idProject),
-        comment: userComment,
-      },
-    });
+    if (user?.premium || countUserComments < 5) {
+      addCommentary({
+        variables: {
+          idProject: Number(idProject),
+          comment: userComment,
+        },
+      });
+    } else {
+      showAlert("You can't comment more than 5 projects per month", "warning");
+    }
   };
 
   const dateFormat = (date: Date): string => {
@@ -281,10 +234,7 @@ function ProjectDetailsContainer() {
   };
 
   const handleClickHeart = () => {
-    if (
-      projectDetails &&
-      projectDetails.user.id !== localStorage.getItem("uuid")
-    ) {
+    if (projectDetails && projectDetails.user.id !== user?.id) {
       if (isLiked) {
         deleteLike({
           variables: {
@@ -293,7 +243,7 @@ function ProjectDetailsContainer() {
         });
         setIsLiked(false);
         setLikesCount(likesCount - 1);
-      } else {
+      } else if (user?.premium || countUserLikes < 5) {
         addLike({
           variables: {
             idProject: Number(idProject),
@@ -301,9 +251,11 @@ function ProjectDetailsContainer() {
         });
         setIsLiked(true);
         setLikesCount(likesCount + 1);
+      } else {
+        showAlert("You can't like more than 5 projects per month", "warning");
       }
     } else {
-      alert("This is your project, you can't add like on it"); // eslint-disable-line no-alert
+      showAlert("This is your project, you can't add like on it", "info");
     }
   };
 
@@ -330,6 +282,9 @@ function ProjectDetailsContainer() {
         variables: {
           idComment: Number(id),
         },
+        onCompleted: () => {
+          refetch();
+        },
       });
       if (comments) {
         const newComments = comments?.filter((el) => el.id !== id);
@@ -355,8 +310,12 @@ function ProjectDetailsContainer() {
     }
   };
 
+  const handleDownload = (project: ExistingProjectQueryResult) => {
+    fileHooks.saveProjectAsZip(project);
+  };
+
   const displayProjectTree = (
-    folder: IFolder[],
+    folder: IFolderTree[],
     padding: number,
     isMainFolder: boolean,
   ) => {
@@ -382,20 +341,21 @@ function ProjectDetailsContainer() {
             <div>{el.name}</div>
           </div>
           <div>
-            {el.files.map((file) => {
-              return (
-                <div key={file.name} className="flex gap-2">
-                  <span
-                    style={{
-                      paddingLeft: `${lineBreak * 40 + 40}px`,
-                    }}
-                  >
-                    ╚&gt;
-                  </span>
-                  <div>{`${file.name}.${file.extension}`}</div>
-                </div>
-              );
-            })}
+            {el.files &&
+              el.files.map((file) => {
+                return (
+                  <div key={file.name} className="flex gap-2">
+                    <span
+                      style={{
+                        paddingLeft: `${lineBreak * 40 + 40}px`,
+                      }}
+                    >
+                      ╚&gt;
+                    </span>
+                    <div>{`${file.name}.${file.extension}`}</div>
+                  </div>
+                );
+              })}
           </div>
         </div>
       );
@@ -449,14 +409,33 @@ function ProjectDetailsContainer() {
         </div>
         <div className="flex flex-col justify-center items-center  w-1/2 h-64">
           <Button
-            onClick={() => navigate(`/editor?open=${idProject}`)}
+            onClick={() => navigate(`/editor/${idProject}`)}
             type="submit"
             gradientDuoTone="cyanToBlue"
             className="m-auto"
           >
             SHOW THE CODE
           </Button>
-          <Button type="submit" gradientDuoTone="cyanToBlue" className="m-auto">
+          <Button
+            type="submit"
+            gradientDuoTone="cyanToBlue"
+            className="m-auto"
+            onClick={() =>
+              projectDetails &&
+              folders &&
+              mainFolder &&
+              idProject &&
+              handleDownload({
+                getOneProject: {
+                  description: projectDetails?.description,
+                  id: idProject?.toString(),
+                  name: projectDetails?.name,
+                  public: projectDetails?.isPublic,
+                },
+                getAllFoldersByProjectId: [...folders, mainFolder],
+              })
+            }
+          >
             DOWNLOAD THE PROJECT
           </Button>
         </div>

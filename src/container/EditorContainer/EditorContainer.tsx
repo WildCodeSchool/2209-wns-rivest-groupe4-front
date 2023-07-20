@@ -1,7 +1,7 @@
-import { gql, useMutation, useQuery } from "@apollo/client";
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { NetworkStatus, useMutation, useQuery } from "@apollo/client";
 import { Breadcrumb, Button, Spinner } from "flowbite-react";
-import { useState } from "react";
-
+import { useState, useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import {
   ArrowDownOnSquareIcon,
@@ -10,67 +10,39 @@ import {
   BookmarkIcon,
   ShareIcon,
 } from "@heroicons/react/24/outline";
+import AlertContext from "../../contexts/AlertContext";
 import EditorAside from "../../components/EditorAside/EditorAside";
 import InputEditor from "../../components/InputEditor/InputEditor";
 import ReturnEditor from "../../components/ReturnEditor";
 import IFile from "../../interfaces/IFile";
 import { ExistingProjectQueryResult } from "./types";
-
-export const GET_CHOSEN_PROJECT = gql`
-  query GetOneProject($id: Float!) {
-    getOneProject(id: $id) {
-      id
-      description
-      createdAt
-      name
-      isPublic
-      updatedAt
-    }
-    getAllFoldersByProjectId(idProject: $id) {
-      name
-      id
-      parentFolder {
-        name
-        id
-      }
-      files {
-        id
-        content
-        extension
-        name
-      }
-    }
-  }
-`;
-
-const SAVE_PROJECT = gql`
-  mutation ModifyFile(
-    $idFile: Float!
-    $fileName: String
-    $fileContent: String
-    $fileExtension: String
-  ) {
-    modifyFile(
-      idFile: $idFile
-      name: $fileName
-      content: $fileContent
-      extension: $fileExtension
-    )
-  }
-`;
+import { SAVE_PROJECT, ADD_RUN } from "../../apollo/mutations";
+import { GET_CHOSEN_PROJECT, GET_DAILY_RUNS } from "../../apollo/queries";
+import fileHooks from "../../hooks/fileHooks";
+import useEventListener from "../../hooks/useEventListener";
+import useLoggedUser from "../../hooks/useLoggedUser";
+import IFolder from "../../interfaces/IFolder";
 
 function EditorContainer() {
   document.title = "Codeless4 | Editor";
+  const { user } = useLoggedUser();
+  const { showAlert } = useContext(AlertContext);
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
-
+  const [dailyRuns, setDailyRuns] = useState<number>(0);
   const { idProject } = useParams();
 
   // State that defines the editors current value and the code to be sent as mutation input
-  const [currentFile, setCurrentFile] = useState<IFile>();
+  const [currentFile, setCurrentFile] = useState<IFile>({
+    id: "0",
+    name: "",
+    extension: "",
+    content: "",
+  });
   const [currentProject, setCurrentProject] =
     useState<ExistingProjectQueryResult | null>(null);
   const [codeToRun, setCodeToRun] = useState<string>("");
+  const [ariane, setAriane] = useState<string[]>([]);
 
   const handleEditorValidate = () => {
     if (currentFile) {
@@ -78,6 +50,12 @@ function EditorContainer() {
     }
     setIsOpen(true);
   };
+
+  const { refetch: refreshDailyRuns } = useQuery(GET_DAILY_RUNS, {
+    onCompleted(data: { getDailyRunsUser: number }) {
+      setDailyRuns(data.getDailyRunsUser);
+    },
+  });
 
   const [saveFile] = useMutation(SAVE_PROJECT, {
     variables: {
@@ -88,58 +66,101 @@ function EditorContainer() {
     },
   });
 
-  const { loading } = useQuery(GET_CHOSEN_PROJECT, {
+  const [addRun] = useMutation(ADD_RUN);
+
+  const { loading, networkStatus, refetch } = useQuery(GET_CHOSEN_PROJECT, {
     variables: { id: Number(idProject) },
     onCompleted: (data) => {
       setCurrentProject(data);
+      setCurrentFile(
+        data.getAllFoldersByProjectId.find(
+          (el: IFolder) => el.parentFolder == null || el.files.length > 0,
+        ).files[0],
+      );
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  useEffect(() => {
+    if (currentProject !== null && currentFile) {
+      setAriane(fileHooks.getAriane(currentProject, currentFile));
+    }
+  }, [currentFile, currentProject]);
+
   const handleSave = () => {
     if (currentFile) {
       saveFile();
     }
   };
 
+  const handleKeyboardSave = (event: KeyboardEvent) => {
+    const { key, ctrlKey } = event;
+    if (ctrlKey && key === "s") {
+      event.preventDefault();
+      handleSave();
+    }
+  };
+
+  useEventListener("keydown", handleKeyboardSave);
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleShare = () => {
     // TODO create hashed link userID and projectID
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleDownload = () => {
-    // TODO download zip with project structure
+  const handleDownload = (project: ExistingProjectQueryResult) => {
+    fileHooks.saveProjectAsZip(project);
   };
 
-  const handleRun = () => {
-    setIsOpen(!isOpen);
-    saveFile();
+  const handleRun = async () => {
+    if ((dailyRuns < 50 && !user.premium) || user.premium) {
+      addRun();
+      setDailyRuns(dailyRuns + 1);
+      setIsOpen(!isOpen);
+      saveFile();
+      await refreshDailyRuns();
+    } else {
+      showAlert(
+        "You have reached your daily limit of runs, please upgrade to premium to run more than 50 times a day.",
+        "warning",
+      );
+    }
   };
 
-  if (loading) return <Spinner />;
-
+  if (loading || networkStatus === NetworkStatus.refetch) return <Spinner />;
   return (
-    <div className="flex flex-row h-full">
+    <div className="flex flex-row h-screen">
       {currentProject && (
         <EditorAside
           setCurrentFile={setCurrentFile}
           projectData={currentProject}
+          refetch={refetch}
         />
       )}
       <div className="h-full w-full flex flex-col">
         <div className="flex items-center justify-between bg-[#1b1b1b] px-4">
-          <Breadcrumb aria-label="file-breadcrumb" className="py-3">
-            <Breadcrumb.Item>
+          <Breadcrumb aria-label="file-breadcrumb" className="py-3 w-40">
+            <Breadcrumb.Item className="min-w-fit">
               {currentProject?.getOneProject.name
                 ? currentProject?.getOneProject.name
                 : "Project"}
             </Breadcrumb.Item>
-            <Breadcrumb.Item>
-              {currentFile
-                ? `${currentFile.name}.${currentFile.extension}`
-                : ""}
-            </Breadcrumb.Item>
+            {ariane.map((el, index) =>
+              ariane.length > 3 ? (
+                index < ariane.length - 2 ? (
+                  <Breadcrumb.Item className="min-w-fit" key={el}>
+                    ...
+                  </Breadcrumb.Item>
+                ) : (
+                  <Breadcrumb.Item className="min-w-fit" key={el}>
+                    {el}
+                  </Breadcrumb.Item>
+                )
+              ) : (
+                <Breadcrumb.Item className="min-w-fit" key={el}>
+                  {el}
+                </Breadcrumb.Item>
+              ),
+            )}
           </Breadcrumb>
           <Button
             onClick={() => {
@@ -155,9 +176,14 @@ function EditorContainer() {
             <button type="button" onClick={() => handleSave()}>
               <BookmarkIcon className="h-6 w-6" />
             </button>
-            <button type="button" onClick={() => handleSave()}>
-              <ArrowDownOnSquareIcon className="h-6 w-6" />
-            </button>
+            {currentProject && (
+              <button
+                type="button"
+                onClick={() => handleDownload(currentProject)}
+              >
+                <ArrowDownOnSquareIcon className="h-6 w-6" />
+              </button>
+            )}
             <button type="button" onClick={() => handleSave()}>
               <ShareIcon className="h-6 w-6" />
             </button>
@@ -165,19 +191,25 @@ function EditorContainer() {
         </div>
         <div className="flex flex-row h-full w-full">
           <div className="h-full w-full relative">
-            <InputEditor
-              editorValue={currentFile ? currentFile.content : ""}
-              setEditorValue={(e) => {
-                if (currentFile) {
-                  setCurrentFile({
-                    id: currentFile.id,
-                    name: currentFile.name,
-                    extension: currentFile.extension,
-                    content: e,
-                  });
+            {currentProject && (
+              <InputEditor
+                editorValue={
+                  currentFile
+                    ? currentFile.content
+                    : fileHooks.findFirstFile(currentProject!)
                 }
-              }}
-            />
+                setEditorValue={(e) => {
+                  if (currentFile) {
+                    setCurrentFile({
+                      id: currentFile.id,
+                      name: currentFile.name,
+                      extension: currentFile.extension,
+                      content: e,
+                    });
+                  }
+                }}
+              />
+            )}
             <button
               type="button"
               style={{
@@ -195,9 +227,15 @@ function EditorContainer() {
               )}
             </button>
           </div>
-          {isOpen && (
+          {isOpen && currentFile && (
             <div className="h-full w-full">
-              <ReturnEditor codeToQuery={codeToRun} />
+              <ReturnEditor
+                codeToQuery={fileHooks.getImportedFiles(
+                  codeToRun,
+                  currentProject!,
+                )}
+                fileExtension={currentFile.extension}
+              />
             </div>
           )}
         </div>

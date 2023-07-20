@@ -1,22 +1,13 @@
+import { useContext } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Button } from "flowbite-react";
-
 import { NavLink, useNavigate } from "react-router-dom";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import ITokenWithUserValues from "../interfaces/ITokenWithUser";
-
-const CREATE_USER = gql`
-  mutation Mutation($pseudo: String!, $password: String!, $email: String!) {
-    createUser(pseudo: $pseudo, password: $password, email: $email) {
-      token
-      user {
-        id
-      }
-    }
-  }
-`;
+import { CREATE_USER } from "../apollo/mutations";
+import AlertContext from "../contexts/AlertContext";
 
 interface IRegisterFormValues {
   email: string;
@@ -51,9 +42,10 @@ const schema = yup
 
 function RegisterContainer() {
   document.title = "Codeless4 | Register";
+  const { showAlert } = useContext(AlertContext);
 
   const navigate = useNavigate();
-  const [signUp, { error }] = useMutation(CREATE_USER, {
+  const [signUp, { error: queryError }] = useMutation(CREATE_USER, {
     onCompleted(data: { createUser: ITokenWithUserValues }) {
       localStorage.setItem("token", data.createUser.token);
       localStorage.setItem("uuid", data.createUser.user.id);
@@ -78,6 +70,10 @@ function RegisterContainer() {
       },
     });
   };
+
+  if (queryError) {
+    showAlert(queryError.message, "error");
+  }
 
   return (
     <form
@@ -142,7 +138,7 @@ function RegisterContainer() {
             </span>
           )}
         </label>
-        {error?.message === "Invalid Auth" && (
+        {queryError?.message === "Invalid Auth" && (
           <span className="text-sm text-red-600">Invalid Credentials</span>
         )}
       </div>

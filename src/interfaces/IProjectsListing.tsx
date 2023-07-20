@@ -2,7 +2,7 @@ import IUser from "./IUser";
 import ILike from "./ILike";
 import IComment from "./IComment";
 
-export default interface IProjectsListing {
+export default interface IProjectsListingProps {
   id: number;
   name: string;
   description: string;
@@ -12,4 +12,5 @@ export default interface IProjectsListing {
   comments: IComment[];
   isUserProject?: boolean;
   isPublic: boolean;
+  createdAt: Date;
 }

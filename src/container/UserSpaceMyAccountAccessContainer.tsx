@@ -1,68 +1,49 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Button } from "flowbite-react";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import IUser from "../interfaces/IUser";
 import ILike from "../interfaces/ILike";
-
-const GET_ONE_USER = gql`
-  query Query($getOneUserId: String!) {
-    getOneUser(id: $getOneUserId) {
-      email
-      dailyRuns
-      hashedPassword
-      premium
-      pseudo
-    }
-  }
-`;
-
-const GET_USER_LIKES = gql`
-  query Query {
-    getAllLikesByUser {
-      id
-    }
-  }
-`;
-
-const GET_USER_COMMENTS = gql`
-  query GetAllCommentsByUser {
-    getAllCommentsByUser {
-      id
-    }
-  }
-`;
+import {
+  GET_USER_LIKES,
+  GET_USER_COMMENTS,
+  GET_DAILY_RUNS,
+} from "../apollo/queries";
 
 const graduationColor = [
-  { min: 0, max: 20, color: "from-green-800 via-green-600 to-green-400" },
-  { min: 21, max: 40, color: "from-lime-800 via-lime-600 to-lime-400" },
-  { min: 41, max: 60, color: "from-yellow-800 via-yellow-600 to-yellow-400" },
-  { min: 61, max: 80, color: "from-orange-800 via-orange-600 to-orange-400" },
-  { min: 81, max: 100, color: "from-red-800 via-red-600 to-red-400" },
+  { min: 0, max: 20, color: " from-green-800 via-green-600 to-green-400" },
+  { min: 21, max: 40, color: " from-lime-800 via-lime-600 to-lime-400" },
+  { min: 41, max: 60, color: " from-yellow-800 via-yellow-600 to-yellow-400" },
+  { min: 61, max: 80, color: " from-orange-800 via-orange-600 to-orange-400" },
+  { min: 81, max: 100, color: " from-red-800 via-red-600 to-red-400" },
 ];
 
-function UserSpaceMyAccountAccessContainer() {
+interface IUserInformationsProps {
+  user: IUser;
+}
+
+function UserSpaceMyAccountAccessContainer({ user }: IUserInformationsProps) {
   const [dailyRuns, setDailyRuns] = useState<number>(0);
   const [likes, setLikes] = useState<number>(0);
   const [comments, setComments] = useState<number>(0);
 
-  const [isPremium, setIsPremium] = useState<boolean>(false);
-  useQuery(GET_ONE_USER, {
-    onCompleted(data: { getOneUser: IUser }) {
-      setIsPremium(data.getOneUser.premium);
-      setDailyRuns(data.getOneUser.dailyRuns);
+  const [isPremium] = useState<boolean>(user.premium);
+
+  useQuery(GET_USER_LIKES, {
+    onCompleted(data: { getMonthlyLikesByUser: ILike[] }) {
+      setLikes(data.getMonthlyLikesByUser.length);
     },
   });
 
-  useQuery(GET_USER_LIKES, {
-    onCompleted(data: { getAllLikesByUser: ILike[] }) {
-      setLikes(data.getAllLikesByUser.length);
+  useQuery(GET_DAILY_RUNS, {
+    onCompleted(data: { getDailyRunsUser: number }) {
+      setDailyRuns(data.getDailyRunsUser);
     },
   });
 
   useQuery(GET_USER_COMMENTS, {
-    onCompleted(data: { getAllCommentsByUser: Comment[] }) {
-      setComments(data.getAllCommentsByUser.length);
+    onCompleted(data: { getMonthlyCommentsByUser: Comment[] }) {
+      setComments(data.getMonthlyCommentsByUser.length);
     },
   });
 
@@ -88,7 +69,7 @@ function UserSpaceMyAccountAccessContainer() {
           {!isPremium ? (
             <div className="flex items-center w-full bg-white rounded-sm h-6">
               <p
-                className={`font-bold text-black flex justify-center bg-gradient-to-r animate-premiumColorChanging${
+                className={`font-bold text-black flex justify-center bg-gradient-to-r animate-premiumColorChanging ${
                   graduationColor[
                     graduationColor.findIndex(
                       (el) =>
