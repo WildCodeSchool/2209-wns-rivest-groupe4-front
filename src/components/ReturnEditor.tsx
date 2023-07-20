@@ -19,7 +19,10 @@ function ReturnEditor({ codeToQuery, fileExtension }: Props) {
   useEffect(() => {
     axios({
       method: "post",
-      url: "http://localhost:7008/compiler/file",
+      url:
+        process.env.NODE_ENV === "production"
+          ? "/compiler/file"
+          : "http://localhost:7008/compiler/file",
       data: {
         code: btoa(codeToQuery).toString(),
         fileExtension,
